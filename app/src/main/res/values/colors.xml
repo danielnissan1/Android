@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="baby_pink">#E6BEC6</color>
+    <color name="dark_baby_pink">#D59FAA</color>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="background">#F0F4F3</color>
 </resources>
