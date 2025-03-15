@@ -86,7 +86,7 @@ class NewPostActivity : AppCompatActivity() {
                         put(JSONObject().apply {
                             put("parts", JSONArray().apply {
                                 put(JSONObject().apply {
-                                    put("text", "Item: $itemDescription. Provide a price range in shekels, for example: 100₪-200₪, with no description. if you don't have an answer like this return \"please refine your description\"")
+                                    put("text", "Item: $itemDescription. Provide a price range in shekels, for example: 100₪-200₪, with no description. if you don't have an answer like this return \"refine description\"")
                                 })
                             })
                         })

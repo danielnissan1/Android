@@ -86,12 +86,12 @@
         android:id="@+id/txt3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
+        android:layout_marginStart="20dp"
         android:textColor="@color/dark_text"
         android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/ed3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.191"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/pickPrice"
         app:layout_constraintTop_toBottomOf="@+id/ed2" />
 
