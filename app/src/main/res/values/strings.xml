@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">YadShniya</string>
+    <string name="login">LOGIN</string>
+    <string name="registration">REGISTRATION</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="phoneNumber">Phone number</string>
+    <string name="registerOption">"Don't have an account?"</string>
+    <string name="signup">Sign up</string>
+    <string name="accountExist">"Have an account?"</string>
+    <string name="click"> Click here</string>
+    <string name="register">Register</string>
 </resources>
