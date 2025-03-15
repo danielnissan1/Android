@@ -22,7 +22,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import kotlin.math.log
+
 
 class NewPostActivity : AppCompatActivity() {
 
@@ -76,8 +76,9 @@ class NewPostActivity : AppCompatActivity() {
             insets
         }
     }
+      private fun fetchPriceRecommendation(itemDescription: String, textView: TextView) {
 
-    private fun fetchPriceRecommendation(itemDescription: String, textView: TextView) {
+        val apiKey = BuildConfig.GEMINI_API_KEY
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val requestBodyJson = JSONObject().apply {
@@ -95,7 +96,7 @@ class NewPostActivity : AppCompatActivity() {
                 val body = requestBodyJson.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
 
                 val request = Request.Builder()
-                    .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp:generateContent?key=AIzaSyCUJ6OmWfZqX1biRXhxLMiC4x1Bjke9608") // Replace with your API key!
+                    .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp:generateContent?key=${apiKey}") // Replace with your API key!
                     .post(body)
                     .addHeader("Content-Type", "application/json")
                     .build()

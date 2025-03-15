@@ -8,6 +8,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
+        buildConfigField("String", "GEMINI_API_KEY", "\"${project.findProperty("GEMINI_API_KEY")}\"")
         applicationId = "com.example.yadshniya"
         minSdk = 25
         targetSdk = 34
@@ -32,6 +33,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+    }
+    buildFeatures {
+        buildConfig = true  // ✅ Enables BuildConfig generation
     }
 }
 
