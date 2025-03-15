@@ -10,4 +10,11 @@
     <string name="accountExist">"Have an account?"</string>
     <string name="click"> Click here</string>
     <string name="register">Register</string>
+    <string name="newPost">NEW POST</string>
+    <string name="description">Description</string>
+    <string name="location">Location</string>
+    <string name="price">Price</string>
+    <string name="post">Post</string>
+    <string name="pickPrice">HELP ME PICK A PRICE</string>
+
 </resources>
