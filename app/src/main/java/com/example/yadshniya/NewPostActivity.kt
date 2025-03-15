@@ -1,15 +1,24 @@
 package com.example.yadshniya
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import kotlinx.coroutines.CoroutineScope
@@ -28,18 +37,20 @@ class NewPostActivity : AppCompatActivity() {
 
     private val client = OkHttpClient()
     private val TAG = "NewPostActivity"  // Define a tag for filtering logs
+    private lateinit var pickImageButton: ImageButton
 
+    private lateinit var imageSelectionCallBack: ActivityResultLauncher<Intent>
+    private var imageURI: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_new_post)
+        setUi()
 
         val descriptionEditText = findViewById<EditText>(R.id.ed1)
         val pickPriceButton = findViewById<Button>(R.id.pickPrice)
         val priceRecommendationTextView = findViewById<TextView>(R.id.txt3)
-
-        listModels()
 
         // Initially, set the Pick Price button visibility to GONE
         pickPriceButton.visibility = View.GONE
@@ -146,26 +157,59 @@ class NewPostActivity : AppCompatActivity() {
         }
     }
 
-    private fun listModels() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val request = Request.Builder()
-                    .url("https://generativelanguage.googleapis.com/v1beta/models?key=AIzaSyCUJ6OmWfZqX1biRXhxLMiC4x1Bjke9608") // Replace with your API key!
-                    .get()
-                    .build()
-
-                val response = client.newCall(request).execute()
-                val responseBody = response.body?.string()
-
-                if (response.isSuccessful && responseBody != null) {
-                    Log.d("List Models", responseBody)
-                } else {
-                    Log.e("List Models Error", "Response code: ${response.code}, body: $responseBody")
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Log.e("List Models Exception", "Error: ${e.message}", e)
-            }
-        }
+    private fun openGallery() {
+        val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
+        imageSelectionCallBack.launch(intent)
     }
+
+    private fun getImageSize(uri: Uri?): Long {
+        val inputStream = contentResolver.openInputStream(uri!!)
+        return inputStream?.available()?.toLong() ?: 0
+    }
+
+    private fun defineImageSelectionCallBack() {
+        imageSelectionCallBack =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+                try {
+                    val imageUri: Uri? = result.data?.data
+                    if (imageUri != null) {
+                        val imageSize = getImageSize(imageUri)
+                        val maxCanvasSize = 5 * 1024 * 1024 // 5MB
+                        if (imageSize > maxCanvasSize) {
+                            Toast.makeText(
+                                this@NewPostActivity,
+                                "Selected image is too large",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            pickImageButton.setImageURI(imageUri)
+                            imageURI = imageUri
+                            pickImageButton.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white))
+
+                        }
+
+                    } else {
+                        Toast.makeText(this@NewPostActivity, "No Image Selected", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this@NewPostActivity, "Error processing result", Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+    }
+
+    private fun setUi (){
+        pickImageButton = findViewById(R.id.PicButtonNewPostScreen)
+
+        defineImageSelectionCallBack()
+        pickImageButton.setOnClickListener {
+            Log.i("buttonClick", "pick profile pick button in signup screen clicked")
+            openGallery()
+        }
+
+    }
+
+
 }
