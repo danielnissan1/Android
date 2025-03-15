@@ -68,15 +68,21 @@ class RegisterActivity : AppCompatActivity()  {
             }
     }
 
-    fun setUi (){
-        var signUpButton = findViewById<Button>(R.id.registerButton)
-        var loginButton = findViewById<Button>(R.id.gotoLogin)
+    private fun setUi (){
+        val signUpButton = findViewById<Button>(R.id.registerButton)
+        val loginButton = findViewById<Button>(R.id.gotoLogin)
         pickProfileImageButton = findViewById(R.id.profilePicButtonSignUpScreen)
 
         defineImageSelectionCallBack()
         pickProfileImageButton.setOnClickListener {
             Log.i("buttonClick", "pick profile pick button in signup screen clicked")
             openGallery()
+        }
+
+        loginButton.setOnClickListener {
+            Log.i("buttonClick", "login button in register screen clicked")
+            val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
+            startActivity(intent)
         }
     }
 }
