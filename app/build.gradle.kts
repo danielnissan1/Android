@@ -8,6 +8,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
+        buildConfigField("String", "GEMINI_API_KEY", "\"${project.findProperty("GEMINI_API_KEY")}\"")
         applicationId = "com.example.yadshniya"
         minSdk = 25
         targetSdk = 34
@@ -33,9 +34,13 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        buildConfig = true  // ✅ Enables BuildConfig generation
+    }
 }
 
 dependencies {
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation(libs.material.v140)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
