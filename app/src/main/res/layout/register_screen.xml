@@ -32,11 +32,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text1"
+        app:layout_constraintTop_toBottomOf="@+id/resitrationText"
         app:srcCompat="@drawable/profile" />
 
     <TextView
-        android:id="@+id/text1"
+        android:id="@+id/resitrationText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/registration"
@@ -49,11 +49,24 @@
         app:layout_constraintTop_toBottomOf="@+id/image_view" />
 
     <EditText
-        android:id="@+id/ed1"
+        android:id="@+id/nameTextfield"
         android:layout_width="320dp"
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
-        android:hint="@string/username"
+        android:hint="@string/name"
+        android:paddingLeft="20sp"
+        android:paddingRight="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextfield" />
+
+    <EditText
+        android:id="@+id/usernameTextfield"
+        android:layout_width="320dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:hint="@string/email"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -62,22 +75,23 @@
         app:layout_constraintTop_toBottomOf="@+id/profilePicButtonSignUpScreen" />
 
     <EditText
-        android:id="@+id/ed2"
+        android:id="@+id/passwordTextfield"
         android:layout_width="320dp"
         android:layout_height="50dp"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="20dp"
         android:hint="@string/password"
         android:paddingLeft="20sp"
         android:paddingRight="20sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ed1" />
+        app:layout_constraintTop_toBottomOf="@+id/nameTextfield" />
 
     <EditText
         android:id="@+id/ed3"
         android:layout_width="320dp"
         android:layout_height="50dp"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="20dp"
         android:hint="@string/phoneNumber"
         android:inputType="textPassword"
         android:longClickable="false"
@@ -85,7 +99,7 @@
         android:paddingRight="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ed2" />
+        app:layout_constraintTop_toBottomOf="@+id/passwordTextfield" />
 
     <Button
         android:id="@+id/registerButton"
