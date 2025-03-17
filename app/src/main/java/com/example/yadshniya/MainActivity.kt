@@ -9,6 +9,8 @@ import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,8 +23,26 @@ class MainActivity : AppCompatActivity() {
 //            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
 //            insets
 //        }
-        setContentView(R.layout.main_screen)
         setUI()
+        setContentView(R.layout.login_screen)
+        FirebaseApp.initializeApp(this)
+        val db = FirebaseFirestore.getInstance()
+
+        val user = hashMapOf(
+            "name" to "John Doe",
+            "email" to "johndoe@example.com",
+            "age" to 25
+        )
+
+        db.collection("users").document("user1")
+            .set(user)
+            .addOnSuccessListener {
+                Log.d("Firestore", "User added successfully!")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error adding user", e)
+            }
+
     }
 
     fun setUI() {
