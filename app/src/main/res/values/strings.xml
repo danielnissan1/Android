@@ -2,7 +2,8 @@
     <string name="app_name">YadShniya</string>
     <string name="login">LOGIN</string>
     <string name="registration">REGISTRATION</string>
-    <string name="username">Username</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="phoneNumber">Phone number</string>
     <string name="registerOption">"Don't have an account?"</string>
