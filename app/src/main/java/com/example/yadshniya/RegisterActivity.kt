@@ -66,6 +66,7 @@ class RegisterActivity : AppCompatActivity() {
 //            val profileChange = UserProfileChangeRequest.Builder().setPhotoUri(imageURI)
 //                .setDisplayName("$firstNameValue $lastNameValue").build()
 
+
 //            authenticatedUser.updateProfile(profileChange)
 
 //            UserModel.instance.addUser(

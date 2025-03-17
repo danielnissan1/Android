@@ -4,6 +4,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentContainerView
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -11,13 +15,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        Log.d("MainActivity", "onCreate() called")
+
+//        enableEdgeToEdge()
 //        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.bottom_navigation)) { v, insets ->
 //            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 //            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
 //            insets
 //        }
-//        setUI()
+        setUI()
         setContentView(R.layout.login_screen)
         FirebaseApp.initializeApp(this)
         val db = FirebaseFirestore.getInstance()
@@ -36,11 +42,16 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Log.e("Firestore", "Error adding user", e)
             }
+
     }
 
     fun setUI() {
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
-//        val navHostFragment =
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        val navController = navHostFragment.navController
+        NavigationUI.setupWithNavController(bottomNavigationView, navController)
+
+    //        val navHostFragment =
 //            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
 //        val navController = navHostFragment.navController
 //

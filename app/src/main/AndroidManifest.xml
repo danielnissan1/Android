@@ -22,7 +22,6 @@
         <activity
             android:name="com.example.yadshniya.MainActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,7 +31,6 @@
         <activity android:name="com.example.yadshniya.LoginActivity" android:exported="true">
         </activity>
         <activity android:name="com.example.yadshniya.RegisterActivity" android:exported="true">
-
         </activity>
     </application>
 
