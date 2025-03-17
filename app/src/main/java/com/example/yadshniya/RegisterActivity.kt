@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -145,9 +146,9 @@ private lateinit var binding: ActivityRegisterBinding
     }
 
     private fun register() {
-        val name: String = binding.nameTextfield.text.toString()
-        val email: String = binding.usernameTextfield.text.toString()
-        val password: String = binding.passwordTextfield.text.toString()
+        val name: String = findViewById<EditText>(R.id.nameTextfield).text.toString()
+        val email: String = findViewById<EditText>(R.id.usernameTextfield).text.toString()
+        val password: String = findViewById<EditText>(R.id.passwordTextfield).text.toString()
 
         Log.i("register", "registering user with email: $email, name: $name, password: $password")
         if (email != "" && password != "" && name != "") {
@@ -158,7 +159,8 @@ private lateinit var binding: ActivityRegisterBinding
                     val newUser: User = User(name, email, "")
 
 //                    if (isAvatarSelected) {
-                    val imageView = binding.profilePicButtonSignUpScreen
+                    val imageView = findViewById<ImageButton>(R.id.profilePicButtonSignUpScreen)
+//                    val imageView = binding.profilePicButtonSignUpScreen
 
                     val drawable = imageView.drawable
                     if (drawable is BitmapDrawable) {
