@@ -1,9 +1,12 @@
 package com.example.yadshniya
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,6 +19,23 @@ class MainActivity : AppCompatActivity() {
 //        }
 //        setUI()
         setContentView(R.layout.login_screen)
+        FirebaseApp.initializeApp(this)
+        val db = FirebaseFirestore.getInstance()
+
+        val user = hashMapOf(
+            "name" to "John Doe",
+            "email" to "johndoe@example.com",
+            "age" to 25
+        )
+
+        db.collection("users").document("user1")
+            .set(user)
+            .addOnSuccessListener {
+                Log.d("Firestore", "User added successfully!")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error adding user", e)
+            }
     }
 
     fun setUI() {
