@@ -12,7 +12,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 class Model private constructor() {
-    enum class MaslulimListLoadingState {
+    enum class PostsListLoadingState {
         LOADING,
         NOT_LOADING
     }
@@ -20,127 +20,121 @@ class Model private constructor() {
     private val firebaseModel: FirebaseModel = FirebaseModel()
     var executor: Executor = Executors.newFixedThreadPool(1)
     var mainThread: Handler = HandlerCompat.createAsync(Looper.getMainLooper())
-    var localDb: AppLocalDbRepository = AppLocalDb.getAppDb()
+    var localDb: AppLocalDbRepository = AppLocalDb.appDb
 
-    val EventMaslulimListLoadingState: MutableLiveData<MaslulimListLoadingState?> =
-        MutableLiveData(MaslulimListLoadingState.NOT_LOADING)
+    val EventPostsListLoadingState: MutableLiveData<PostsListLoadingState> =
+        MutableLiveData(PostsListLoadingState.NOT_LOADING)
 
     interface Listener<T> {
         fun onComplete(data: T)
     }
 
-    private var allMaslulimList: LiveData<List<Maslul?>>? = null
+    private var allPostsList: LiveData<List<Post?>>? = null
 
-    private var myMaslulimList: LiveData<List<Maslul>>? = null
+    private var myPostsList: LiveData<List<Post>>? = null
 
-    val allMaslulim: LiveData<List<Any?>>
+    val allPosts: LiveData<List<Post?>>?
         get() {
-            if (allMaslulimList == null) {
-                allMaslulimList = localDb.maslulDao().getAll()
-                refreshAllMaslulim()
+            if (allPostsList == null) {
+                allPostsList = localDb.PostDao()?.getAll()
+//                refreshAllMaslulim()
             }
-            return allMaslulimList
+            return allPostsList
         }
 
-    val myMaslulim: LiveData<List<Any>>
+    val MyPost: LiveData<List<Post>>?
         get() {
-            if (myMaslulimList == null) {
-                myMaslulimList = localDb.maslulDao().getMyMaslulim(userEmail)
-                refreshAllMaslulim()
+            if (myPostsList == null) {
+                myPostsList = localDb.PostDao()?.getPostsByUser(firebaseModel.userEmail)
+//                refreshAllMaslulim()
             }
-            return myMaslulimList
+            return myPostsList
         }
 
-    fun refreshAllMaslulim() {
-        EventMaslulimListLoadingState.value = MaslulimListLoadingState.LOADING
+//    fun refreshAllPosts() {
+//        EventPostsListLoadingState.value = PostsListLoadingState.LOADING
+//
+//        // get local last update
+////        val localLastUpdate: Long = Post.getLocalLastUpdate()
+//
+//        // get all updated records from firebase since local last update
+//        firebaseModel.getAllMaslulimSince(localLastUpdate) { list ->
+//            executor.execute {
+//                Log.d("TAG", " firebase return : " + list.size())
+//                var time = localLastUpdate
+//                for (maslul in list) {
+//                    // insert new records into ROOM
+//                    if (maslul.getDeleted()) {
+//                        localDb.maslulDao().delete(maslul)
+//                    } else {
+//                        localDb.maslulDao().insertAll(maslul)
+//                    }
+//
+//                    if (time < maslul.getLastUpdated()) {
+//                        time = maslul.getLastUpdated()
+//                    }
+//                }
+//                try {
+//                    Thread.sleep(3000)
+//                } catch (e: InterruptedException) {
+//                    e.printStackTrace()
+//                }
+//                // update local last update
+//                Maslul.setLocalLastUpdate(time)
+//                EventMaslulimListLoadingState.postValue(MaslulimListLoadingState.NOT_LOADING)
+//            }
+//        }
+//    }
 
-        // get local last update
-        val localLastUpdate: Long = Maslul.getLocalLastUpdate()
-
-        // get all updated records from firebase since local last update
-        firebaseModel.getAllMaslulimSince(localLastUpdate) { list ->
-            executor.execute {
-                Log.d("TAG", " firebase return : " + list.size())
-                var time = localLastUpdate
-                for (maslul in list) {
-                    // insert new records into ROOM
-                    if (maslul.getDeleted()) {
-                        localDb.maslulDao().delete(maslul)
-                    } else {
-                        localDb.maslulDao().insertAll(maslul)
-                    }
-
-                    if (time < maslul.getLastUpdated()) {
-                        time = maslul.getLastUpdated()
-                    }
-                }
-                try {
-                    Thread.sleep(3000)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-                // update local last update
-                Maslul.setLocalLastUpdate(time)
-                EventMaslulimListLoadingState.postValue(MaslulimListLoadingState.NOT_LOADING)
-            }
-        }
-    }
-
-    fun addMaslul(maslul: Maslul, listener: Listener<Void?>) {
-        maslul.setUserId(userEmail)
-        firebaseModel.saveMaslul(maslul) { Void ->
-            refreshAllMaslulim()
-            listener.onComplete(null)
-        }
-    }
+//    fun addMaslul(maslul: Maslul, listener: Listener<Void?>) {
+//        maslul.setUserId(userEmail)
+//        firebaseModel.saveMaslul(maslul) { Void ->
+//            refreshAllMaslulim()
+//            listener.onComplete(null)
+//        }
+//    }
 
     fun register(email: String?, password: String?, listener: Listener<FirebaseUser?>?) {
-        firebaseModel.register(email, password, listener)
+        if (listener != null) {
+            firebaseModel.register(email, password, listener)
+        }
     }
 
     fun login(email: String?, password: String?, listener: Listener<FirebaseUser?>?) {
-        firebaseModel.login(email, password, listener)
+        if (listener != null) {
+            firebaseModel.login(email, password, listener)
+        }
     }
 
-    val isSignedIn: Boolean
-        get() = firebaseModel.isSignedIn()
+//    val isSignedIn: Boolean
+//        get() = firebaseModel.isSignedIn()
 
-    fun signOut() {
-        EventMaslulimListLoadingState.postValue(null)
-        firebaseModel.signOut()
-    }
+//    fun signOut() {
+//        EventPostsListLoadingState.postValue(null)
+//        firebaseModel.signOut()
+//    }
 
-    fun addUser(user: User?, listener: Listener<User?>?) {
-        firebaseModel.addUser(user, listener)
-    }
+//    fun addUser(user: User?, listener: Listener<User?>?) {
+//        firebaseModel.addUser(user, listener)
+//    }
 
     fun getUserById(email: String?, listener: Listener<User?>?) {
-        firebaseModel.getUserById(email, listener)
+        if (listener != null) {
+            firebaseModel.getUserById(email, listener)
+        }
     }
 
-    val userEmail: String
-        get() = firebaseModel.getUserEmail()
+//    val userEmail: String
+//        get() = firebaseModel.getUserEmail()
 
-    fun uploadImage(name: String?, bitmap: Bitmap?, listener: Listener<String?>?) {
-        firebaseModel.uploadImage(name, bitmap, listener)
+    fun uploadImage(name: String, bitmap: Bitmap, listener: Listener<String?>?) {
+        if (listener != null) {
+            firebaseModel.uploadImage(name, bitmap, listener)
+        }
     }
 
-    fun getMaslulById(maslulId: String?, listener: Listener<Maslul?>) {
-        val maslulimList: List<Maslul?> = allMaslulimList!!.value!!
-        val maslul: Maslul? = maslulimList.stream().filter { ms: Maslul? ->
-            ms.getId().equals
-            (maslulId)
-        }.findFirst().orElse(null)
-        listener.onComplete(maslul)
-    }
 
     companion object {
-        val areas: Array<String> = arrayOf(
-            "Where am I form",
-            "North",
-            "Center",
-            "South"
-        )
 
         private val instance = Model()
         fun instance(): Model {

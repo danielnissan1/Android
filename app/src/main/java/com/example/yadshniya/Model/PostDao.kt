@@ -9,16 +9,16 @@ import androidx.room.Query
 
 
 @Dao
-interface MaslulDao {
-    @get:Query("select * from Post")
-    val all: LiveData<List<Any?>?>?
+interface PostDao {
+    @Query("select * from Post")
+    fun getAll(): LiveData<List<Post?>>
 
     @Query("select * from Post where userId = :userId")
-    fun getMyMaslulim(userId: String?): LiveData<List<Post?>?>?
+    fun getPostsByUser(userId: String?): LiveData<List<Post>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg maslulim: Post?)
+    fun insertAll(vararg posts: Post?)
 
     @Delete
-    fun delete(maslul: Post?)
+    fun delete(post: Post?)
 }
