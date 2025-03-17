@@ -14,8 +14,8 @@ class MainActivity : AppCompatActivity() {
 //            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
 //            insets
 //        }
-//        setUI()
-        setContentView(R.layout.login_screen)
+        setContentView(R.layout.main_screen)
+        setUI()
     }
 
     fun setUI() {

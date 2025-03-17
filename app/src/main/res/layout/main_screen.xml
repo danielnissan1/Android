@@ -20,25 +20,23 @@
 <!--        app:layout_constraintStart_toStartOf="parent"-->
 <!--        app:layout_constraintEnd_toEndOf="parent" />-->
 
-    <!-- Fragment container below the logo -->
-<!--    <androidx.fragment.app.FragmentContainerView-->
-<!--        android:id="@+id/fragmentContainerView"-->
-<!--        android:name="androidx.navigation.fragment.NavHostFragment"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        app:defaultNavHost="true"-->
-<!--        app:navGraph="@navigation/brook_nav"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/logo"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/bottom_navigation" />-->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation" />
 
-    <!-- Bottom Navigation fixed at the bottom -->
+    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/baby_pink"
-        app:itemIconTint="@color/dark_baby_pink"
-        app:itemTextColor="@color/dark_baby_pink"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
         app:itemActiveIndicatorStyle="@null"
         app:menu="@menu/bottom_navbar"
         app:layout_constraintBottom_toBottomOf="parent" />

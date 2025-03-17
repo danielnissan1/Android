@@ -63,21 +63,21 @@ class RegisterActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(username, password).addOnSuccessListener {
             val authenticatedUser = it.user!!
 
-            val profileChange = UserProfileChangeRequest.Builder().setPhotoUri(imageURI)
-                .setDisplayName("$firstNameValue $lastNameValue").build()
-
-            authenticatedUser.updateProfile(profileChange)
-
-            UserModel.instance.addUser(
-                User(authenticatedUser.uid, firstNameValue, lastNameValue), imageURI!!
-            ) {
-                Toast.makeText(
-                    this@RegisterActivity, "Register Successful", Toast.LENGTH_SHORT
-                ).show()
-                val intent = Intent(this@RegisterActivity, MainActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
+//            val profileChange = UserProfileChangeRequest.Builder().setPhotoUri(imageURI)
+//                .setDisplayName("$firstNameValue $lastNameValue").build()
+//
+//            authenticatedUser.updateProfile(profileChange)
+//
+//            UserModel.instance.addUser(
+//                User(authenticatedUser.uid, firstNameValue, lastNameValue), imageURI!!
+//            ) {
+//                Toast.makeText(
+//                    this@RegisterActivity, "Register Successful", Toast.LENGTH_SHORT
+//                ).show()
+//                val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+//                startActivity(intent)
+//                finish()
+//            }
         }.addOnFailureListener {
             Toast.makeText(
                 this@RegisterActivity, "Register Failed, " + it.message, Toast.LENGTH_SHORT
