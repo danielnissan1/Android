@@ -1,10 +1,13 @@
 package com.example.yadshniya
 
 import android.content.Intent
+import android.graphics.ColorSpace.Model
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -13,13 +16,15 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.yadshniya.databinding.RegisterScreenBinding
 import com.google.firebase.Firebase
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
+import java.security.AccessController.getContext
 
 
 class RegisterActivity : AppCompatActivity() {
     private val auth = Firebase.auth
+    private var binding = RegisterScreenBinding.inflate(layoutInflater)
 
     private lateinit var pickProfileImageButton: ImageButton
 
@@ -129,4 +134,52 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
     }
+
+    private fun register() {
+        val name: String = binding.nameTextfield.getText().toString()
+        val email: String = binding.usernameTextfield.getText().toString()
+        val password: String = binding.passwordTextfield.getText().toString()
+
+        if (email != "" && password != "" && name != "") {
+
+            Model.instance().register(email, password) { user ->
+                if (user != null) {
+                    val newUser: User = User(name, email, age, area)
+
+                    if (isAvatarSelected) {
+                        binding.registerImageImv.setDrawingCacheEnabled(true)
+                        binding.registerImageImv.buildDrawingCache()
+                        val imageBitmap =
+                            (binding.registerImageImv.getDrawable() as BitmapDrawable).bitmap
+
+                        // Add to storage account and save url
+                        Model.instance()
+                            .uploadImage(email, imageBitmap) { url ->
+                                if (url != null) {
+                                    newUser.setImageUrl(url)
+                                }
+                                Model.instance().addUser(newUser) { usr ->
+                                    binding.registerProgressbar.setVisibility(View.GONE)
+                                    toMainScreen()
+                                }
+                            }
+                    } else {
+                        // Save without img
+                        Model.instance().addUser(newUser) { usr ->
+                            binding.registerProgressbar.setVisibility(View.GONE)
+                            toMainScreen()
+                        }
+                    }
+                } else {
+                    binding.registerProgressbar.setVisibility(View.GONE)
+                }
+            }
+        } else {
+            Toast.makeText(
+                getContext(), "All the fields are required",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
 }

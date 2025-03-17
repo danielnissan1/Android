@@ -37,7 +37,8 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
-        buildConfig = true  // ✅ Enables BuildConfig generation
+        buildConfig = true
+        viewBinding = true
     }
 }
 
@@ -51,6 +52,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
