@@ -16,15 +16,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate() called")
-
 //        enableEdgeToEdge()
 //        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.bottom_navigation)) { v, insets ->
 //            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 //            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
 //            insets
 //        }
+        setContentView(R.layout.main_screen)
         setUI()
-        setContentView(R.layout.login_screen)
+
         FirebaseApp.initializeApp(this)
         val db = FirebaseFirestore.getInstance()
 
@@ -50,11 +50,5 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         val navController = navHostFragment.navController
         NavigationUI.setupWithNavController(bottomNavigationView, navController)
-
-    //        val navHostFragment =
-//            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
-//        val navController = navHostFragment.navController
-//
-//        NavigationUI.setupWithNavController(bottomNavigationView, navController)
     }
 }
