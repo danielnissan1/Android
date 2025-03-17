@@ -3,7 +3,6 @@ package com.example.yadshniya.Model
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.core.os.HandlerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -94,16 +93,12 @@ class Model private constructor() {
 //        }
 //    }
 
-    fun register(email: String?, password: String?, listener: Listener<FirebaseUser?>?) {
-        if (listener != null) {
-            firebaseModel.register(email, password, listener)
-        }
+    fun register(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {
+        firebaseModel.register(email, password, listener)
     }
 
-    fun login(email: String?, password: String?, listener: Listener<FirebaseUser?>?) {
-        if (listener != null) {
+    fun login(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {
             firebaseModel.login(email, password, listener)
-        }
     }
 
 //    val isSignedIn: Boolean
@@ -114,23 +109,19 @@ class Model private constructor() {
 //        firebaseModel.signOut()
 //    }
 
-//    fun addUser(user: User?, listener: Listener<User?>?) {
-//        firebaseModel.addUser(user, listener)
-//    }
+    fun createUser(user: User, listener: (FirebaseUser?) -> Unit) {
+        firebaseModel.createUser(user, listener)
+    }
 
-    fun getUserById(email: String?, listener: Listener<User?>?) {
-        if (listener != null) {
+    fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
             firebaseModel.getUserById(email, listener)
-        }
     }
 
 //    val userEmail: String
 //        get() = firebaseModel.getUserEmail()
 
-    fun uploadImage(name: String, bitmap: Bitmap, listener: Listener<String?>?) {
-        if (listener != null) {
+    fun uploadImage(name: String, bitmap: Bitmap, listener: (FirebaseUser?) -> Unit) {
             firebaseModel.uploadImage(name, bitmap, listener)
-        }
     }
 
 

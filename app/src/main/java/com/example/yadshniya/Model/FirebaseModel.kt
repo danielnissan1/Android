@@ -3,19 +3,16 @@ package com.example.yadshniya.Model
 import android.graphics.Bitmap
 import android.widget.Toast
 import com.example.yadshniya.MyApplication
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
-import java.util.LinkedList
 
 class FirebaseModel internal constructor() {
     var db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -31,7 +28,7 @@ class FirebaseModel internal constructor() {
         auth = FirebaseAuth.getInstance()
     }
 
-    fun uploadImage(name: String, bitmap: Bitmap, listener: Model.Listener<String?>) {
+    fun uploadImage(name: String, bitmap: Bitmap, listener: (FirebaseUser?) -> Unit) {
         val storageRef = storage.reference
         val imagesRef = storageRef.child("images/$name.jpg")
         val baos = ByteArrayOutputStream()
@@ -39,13 +36,30 @@ class FirebaseModel internal constructor() {
         val data = baos.toByteArray()
 
         val uploadTask = imagesRef.putBytes(data)
-        uploadTask.addOnFailureListener { listener.onComplete(null) }.addOnSuccessListener {
-            imagesRef.downloadUrl.addOnSuccessListener { uri ->
-                listener.onComplete(
-                    uri.toString()
-                )
+        uploadTask.addOnFailureListener { listener(null) }
+            .addOnSuccessListener {
+                imagesRef.downloadUrl.addOnSuccessListener { uri ->
+                    val user = FirebaseAuth.getInstance().currentUser
+
+                    if (user != null) {
+                        val profileUpdates = UserProfileChangeRequest.Builder()
+                            .setPhotoUri(uri)
+                            .build()
+
+                        user.updateProfile(profileUpdates)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    listener(user) // Return updated FirebaseUser
+                                } else {
+                                    listener(null)
+                                }
+                            }
+                    } else {
+                        listener(null)
+                    }
+                }
             }
-        }
+
     }
 
     val isSignedIn: Boolean
@@ -60,17 +74,17 @@ class FirebaseModel internal constructor() {
             return currentUser!!.email
         }
 
-    fun login(email: String?, password: String?, listener: Model.Listener<FirebaseUser?>) {
+    fun login(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {
         auth.signInWithEmailAndPassword(email!!, password!!)
             .addOnCompleteListener { task: Task<AuthResult?> ->
                 if (task.isSuccessful) {
-                    listener.onComplete(auth.currentUser)
+                    listener(auth.currentUser)
                 } else {
                     Toast.makeText(
-                        MyApplication.getContext(), task.exception!!.message,
+                        MyApplication.context, task.exception!!.message,
                         Toast.LENGTH_SHORT
                     ).show()
-                    listener.onComplete(null)
+                    listener(null)
                 }
             }
     }
@@ -79,31 +93,31 @@ class FirebaseModel internal constructor() {
         auth.signOut()
     }
 
-    fun register(email: String?, password: String?, listener: Model.Listener<FirebaseUser?>) {
+    fun register(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {
         auth.createUserWithEmailAndPassword(email!!, password!!)
             .addOnCompleteListener { task: Task<AuthResult?> ->
                 if (task.isSuccessful) {
-                    listener.onComplete(auth.currentUser)
+                    listener(auth.currentUser)
                 } else {
                     Toast.makeText(
-                        MyApplication.getContext(), task.exception!!.message,
+                        MyApplication.context, task.exception!!.message,
                         Toast.LENGTH_SHORT
                     ).show()
-                    listener.onComplete(null)
+                    listener(null)
                 }
             }
     }
 
-    fun addUser(user: User, listener: Model.Listener<User?>) {
+    fun createUser(user: User, listener: (FirebaseUser?) -> Unit) {
         val userJson = user.toJson()
         db.collection(User.COLLECTION_NAME)
             .document(user.email!!)
             .set(userJson)
-            .addOnSuccessListener { unused: Void? -> listener.onComplete(user) }
-            .addOnFailureListener { e: Exception? -> listener.onComplete(user) }
+            .addOnSuccessListener { unused: Void? -> listener(user as FirebaseUser) }
+            .addOnFailureListener { e: Exception? -> listener(user as FirebaseUser) }
     }
 
-    fun getUserById(email: String?, listener: Model.Listener<User?>) {
+    fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
         db.collection(User.COLLECTION_NAME)
             .document(email!!)
             .get()
@@ -112,7 +126,7 @@ class FirebaseModel internal constructor() {
                 if (task.isSuccessful and (task.result != null)) {
                     user = task.result!!.data?.let { User.createUser(it) }
                 }
-                listener.onComplete(user)
+                listener(user as FirebaseUser)
             }
     }
 

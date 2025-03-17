@@ -13,8 +13,8 @@ class MyApplication : Application() {
     companion object {
         lateinit var context: Context
 
-        fun getContext(): Context {
-            return context
-        }
+//        fun getContext(): Context {
+//            return context
+//        }
     }
 }

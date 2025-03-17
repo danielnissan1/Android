@@ -71,12 +71,12 @@ class Post {
         var localLastUpdate: Long?
             get() {
                 val sharedPref =
-                    MyApplication.getContext().getSharedPreferences("TAG", Context.MODE_PRIVATE)
+                    MyApplication.context.getSharedPreferences("TAG", Context.MODE_PRIVATE)
                 return sharedPref.getLong(LOCAL_LAST_UPDATED, 0)
             }
             set(time) {
                 val sharedPref =
-                    MyApplication.getContext().getSharedPreferences("TAG", Context.MODE_PRIVATE)
+                    MyApplication.context.getSharedPreferences("TAG", Context.MODE_PRIVATE)
                 val editor = sharedPref.edit()
                 editor.putLong(LOCAL_LAST_UPDATED, time!!)
                 editor.commit()
