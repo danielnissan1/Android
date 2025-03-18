@@ -2,17 +2,14 @@ package com.example.yadshniya
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.ColorSpace.Model
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -23,7 +20,6 @@ import com.example.yadshniya.Model.User
 import com.example.yadshniya.databinding.ActivityRegisterBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import java.security.AccessController.getContext
 
 
 class RegisterActivity : AppCompatActivity() {
@@ -115,35 +111,43 @@ private lateinit var binding: ActivityRegisterBinding
     }
 
     private fun defineImageSelectionCallBack() {
-         imageSelectionCallBack =
+        imageSelectionCallBack =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
                 try {
                     val imageUri: Uri? = result.data?.data
+                    Log.d("ImageSelection", "Image URI: $imageUri") // Debugging log
+
                     if (imageUri != null) {
                         val imageSize = getImageSize(imageUri)
                         val maxCanvasSize = 5 * 1024 * 1024 // 5MB
                         if (imageSize > maxCanvasSize) {
+                            Log.e("ImageSelection", "Selected image is too large")
                             Toast.makeText(
                                 this@RegisterActivity,
                                 "Selected image is too large",
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
+                            Log.d("ImageSelection", "Setting image to button")
                             pickProfileImageButton.setImageURI(imageUri)
                             imageURI = imageUri
+                            Log.d("ImageSelection", "Image successfully set")
                         }
-
                     } else {
+                        Log.e("ImageSelection", "No image selected")
                         Toast.makeText(this@RegisterActivity, "No Image Selected", Toast.LENGTH_SHORT)
                             .show()
                     }
                 } catch (e: Exception) {
+                    Log.e("ImageSelection", "Error processing image: ${e.message}")
                     Toast.makeText(
                         this@RegisterActivity, "Error processing result", Toast.LENGTH_SHORT
                     ).show()
                 }
             }
     }
+
+
 
     private fun register() {
         val name: String = findViewById<EditText>(R.id.nameTextfield).text.toString()
@@ -156,37 +160,39 @@ private lateinit var binding: ActivityRegisterBinding
             instance().register(email, password)
             { user ->
                 if (user != null) {
-                    val newUser: User = User(name, email, "")
+                    val newUser = User(name, email)
 
-//                    if (isAvatarSelected) {
+                    if (pickProfileImageButton.drawable != null) {
                     val imageView = findViewById<ImageButton>(R.id.profilePicButtonSignUpScreen)
 //                    val imageView = binding.profilePicButtonSignUpScreen
+
+                        Log.d("RegisterActivity", "Image view: $imageView")
 
                     val drawable = imageView.drawable
                     if (drawable is BitmapDrawable) {
                         val imageBitmap = drawable.bitmap
-
+Log.d("RegisterActivity", "Image bitmap: $imageBitmap")
                         // Add to storage account and save url
-                        instance()
-                            .uploadImage(email, imageBitmap) { url ->
-                                if (url != null) {
-                                    newUser.imageUrl = url.toString()
-                                }
-                                instance().createUser(newUser) { user ->
-//                                    TODO: toMainScreen()
-//                                    toMainScreen()
-                                }
-                            }
+//                        instance()
+//                            .uploadImage(email, imageBitmap) { url ->
+//                                if (url != null) {
+//                                    newUser.imageUrl = url.toString()
+//                                }
+                                instance().createUser(
+                                    newUser,
+                                    img = imageBitmap
+                                ) { toMainScreen() }
+
                     } else {
                         Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show()
                     }
 //                    } else {
 //                        // Save without img
-//                        Model.instance().addUser(newUser) { usr ->
-//                            binding.registerProgressbar.setVisibility(View.GONE)
-//                            toMainScreen()
-//                        }
-//                    }
+//                        instance().createUser(
+//                            newUser,
+//                            img = ""
+//                        ) { toMainScreen() }
+                    }
                 } else {
                     Toast.makeText(
                         this, "Register failed",
@@ -200,6 +206,19 @@ private lateinit var binding: ActivityRegisterBinding
                 Toast.LENGTH_LONG
             ).show()
         }
+    }
+
+    private fun toMainScreen() {
+
+//        val intent = Intent(this@feedFragmentDirections, RegisterActivity::class.java)
+//        startActivity(intent)
+
+//        val intent: Intent = Intent(
+//            getContext(),
+//            MainActivity::class.java
+//        )
+//        startActivity(intent)
+//        getActivity().finish()
     }
 
 }

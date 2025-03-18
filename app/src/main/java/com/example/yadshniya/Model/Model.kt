@@ -6,6 +6,8 @@ import android.os.Looper
 import androidx.core.os.HandlerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.yadshniya.CloudinaryCallback
+import com.example.yadshniya.EmptyCallback
 import com.example.yadshniya.MyApplication
 import com.google.firebase.auth.FirebaseUser
 import java.util.concurrent.Executor
@@ -18,6 +20,8 @@ class Model private constructor() {
     }
 
     private val firebaseModel: FirebaseModel = FirebaseModel()
+    private val cloudinaryModel = CloudinaryModel()
+
     var executor: Executor = Executors.newFixedThreadPool(1)
     var mainThread: Handler = HandlerCompat.createAsync(Looper.getMainLooper())
     var localDb: AppLocalDbRepository = AppLocalDbRepository.getDatabase(MyApplication.context)
@@ -110,19 +114,33 @@ class Model private constructor() {
 //        firebaseModel.signOut()
 //    }
 
-    fun createUser(user: User, listener: (User?) -> Unit) {
-        firebaseModel.createUser(user, listener)
+//    fun createUser(user: User, listener: (User?) -> Unit) {
+//        firebaseModel.createUser(user, listener)
+//    }
+
+    fun createUser(user: User, img:Bitmap?, callback: EmptyCallback) {
+        firebaseModel.createUser(user) {
+            callback()
+        }
+        img?.let {
+            cloudinaryModel.uploadBitmap(it) { url ->
+                if (!url.isNullOrEmpty()) {
+                    user.imageUrl = url
+                    firebaseModel.createUser(user, callback)
+                }
+            }
+        } ?: callback()
     }
 
-    fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
-            firebaseModel.getUserById(email, listener)
-    }
+//    fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
+//            firebaseModel.getUserById(email, listener)
+//    }
 
 //    val userEmail: String
 //        get() = firebaseModel.getUserEmail()
 
-    fun uploadImage(name: String, bitmap: Bitmap, listener: (FirebaseUser?) -> Unit) {
-            firebaseModel.uploadImage(name, bitmap, listener)
+    fun uploadImage(name: String, bitmap: Bitmap, listener: (String?) -> Unit) {
+//            firebaseModel.uploadImage(name, bitmap, listener)
     }
 
 

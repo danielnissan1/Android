@@ -69,4 +69,5 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:21.0.1")
     implementation ("androidx.room:room-runtime:2.5.2")
     kapt("androidx.room:room-compiler:2.5.2")
+    implementation(libs.cloudinary.android)
 }

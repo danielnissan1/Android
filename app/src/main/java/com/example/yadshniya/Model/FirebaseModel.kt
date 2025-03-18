@@ -2,12 +2,12 @@ package com.example.yadshniya.Model
 
 import android.graphics.Bitmap
 import android.widget.Toast
+import com.example.yadshniya.EmptyCallback
 import com.example.yadshniya.MyApplication
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -21,46 +21,46 @@ class FirebaseModel internal constructor() {
 
     init {
         val settings = FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(false)
-            .build()
+            .build()  // No need to set persistence explicitly
         db.firestoreSettings = settings
         storage = FirebaseStorage.getInstance()
         auth = FirebaseAuth.getInstance()
     }
 
-    fun uploadImage(name: String, bitmap: Bitmap, listener: (FirebaseUser?) -> Unit) {
-        val storageRef = storage.reference
-        val imagesRef = storageRef.child("images/$name.jpg")
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val data = baos.toByteArray()
-
-        val uploadTask = imagesRef.putBytes(data)
-        uploadTask.addOnFailureListener { listener(null) }
-            .addOnSuccessListener {
-                imagesRef.downloadUrl.addOnSuccessListener { uri ->
-                    val user = FirebaseAuth.getInstance().currentUser
-
-                    if (user != null) {
-                        val profileUpdates = UserProfileChangeRequest.Builder()
-                            .setPhotoUri(uri)
-                            .build()
-
-                        user.updateProfile(profileUpdates)
-                            .addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    listener(user) // Return updated FirebaseUser
-                                } else {
-                                    listener(null)
-                                }
-                            }
-                    } else {
-                        listener(null)
-                    }
-                }
-            }
-
-    }
+//    fun uploadImage(name: String, bitmap: Bitmap, listener: (String?) -> Unit) {
+//        val storageRef = storage.reference
+//        val imagesRef = storageRef.child("images/$name.jpg")
+//        val baos = ByteArrayOutputStream()
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+//        val data = baos.toByteArray()
+//
+//        val uploadTask = imagesRef.putBytes(data)
+//        uploadTask.addOnFailureListener { listener(null) }
+//            .addOnSuccessListener {
+//                imagesRef.downloadUrl.addOnSuccessListener { uri ->
+//                    listener(uri.toString())
+////                    val user = FirebaseAuth.getInstance().currentUser
+////
+////                    if (user != null) {
+////                        val profileUpdates = UserProfileChangeRequest.Builder()
+////                            .setPhotoUri(uri)
+////                            .build()
+////
+////                        user.updateProfile(profileUpdates)
+////                            .addOnCompleteListener { task ->
+////                                if (task.isSuccessful) {
+////                                    listener(user) // Return updated FirebaseUser
+////                                } else {
+////                                    listener(null)
+////                                }
+////                            }
+////                    } else {
+////                        listener(null)
+////                    }
+//                }
+//            }
+//
+//    }
 
     val isSignedIn: Boolean
         get() {
@@ -108,14 +108,20 @@ class FirebaseModel internal constructor() {
             }
     }
 
-    fun createUser(user: User, listener: (User?) -> Unit) {
+    fun createUser(user: User, callback: EmptyCallback) {
         val userJson = user.toJson()
-        db.collection(User.COLLECTION_NAME)
-            .document(user.email!!)
+        db.collection(User.COLLECTION_NAME).document(user.email!!)
             .set(userJson)
-            .addOnSuccessListener { unused: Void? -> listener(user) }
-            .addOnFailureListener { e: Exception? -> listener(user) }
-    }
+            .addOnCompleteListener {
+                callback()
+            }
+//        val userJson = user.toJson()
+//        db.collection(User.COLLECTION_NAME)
+//            .document(user.email!!)
+//            .set(userJson)
+//            .addOnSuccessListener { unused: Void? -> listener(user) }
+//            .addOnFailureListener { e: Exception? -> listener(user) }
+//    }
 
     fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
         db.collection(User.COLLECTION_NAME)
@@ -162,4 +168,4 @@ class FirebaseModel internal constructor() {
 //            .addOnSuccessListener { unused: Void? -> listener.onComplete(null) }
 //            .addOnFailureListener { e: Exception? -> listener.onComplete(null) }
 //    }
-}
+}}
