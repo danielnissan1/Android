@@ -32,7 +32,7 @@ class CloudinaryModel {
         val context = MyApplication.context!! ?: return
         val filepath: File = bitmapToFile(bitmap, context)
         MediaManager.get().upload(filepath.path)
-            .option("folder", "calss3")
+            .option("folder", "images")
             .callback(object: UploadCallback{
                 override fun onStart(requestId: String?) {
 //                    TODO("Not yet implemented")
