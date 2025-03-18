@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "222069255298",
-    "project_id": "yadshniya-5cedb",
-    "storage_bucket": "yadshniya-5cedb.firebasestorage.app"
+    "project_number": "364231854777",
+    "project_id": "yadshniya-d57d1",
+    "storage_bucket": "yadshniya-d57d1.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:222069255298:android:2e910a3b2d1bea2356189b",
+        "mobilesdk_app_id": "1:364231854777:android:0b2e4f2fb1896911322968",
         "android_client_info": {
           "package_name": "com.example.yadshniya"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBAodf88gV8OZ2AuZ94dvCcpXQ74ZVuPUY"
+          "current_key": "AIzaSyDtXJeJWthAjZGNXo6KmHWyziRqbrssLjQ"
         }
       ],
       "services": {
