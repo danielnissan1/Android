@@ -18,6 +18,6 @@
         android:id="@+id/profileFragment"
         android:title="profile"
         android:enabled="true"
-        android:icon='@drawable/baseline_accessibility_new_24'/>
+        android:icon='@drawable/baseline_account_circle_24'/>
 
 </menu>

@@ -19,7 +19,16 @@
         android:label="new_post"
         tools:layout="@layout/activity_new_post">
         <action
-            android:id="@+id/action_to_feed_Tab"
+            android:id="@+id/action_to_new_post_Tab"
             app:destination="@id/newPostFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.yadshniya.Fragments.profileFragment"
+        android:label="profile"
+        tools:layout="@layout/activity_profile">
+        <action
+            android:id="@+id/action_to_profile_Tab"
+            app:destination="@id/profileFragment" />
     </fragment>
 </navigation>
