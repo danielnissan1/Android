@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.application)
     id("androidx.navigation.safeargs.kotlin")
+    id ("kotlin-kapt")
+
 }
 
 android {
@@ -37,7 +39,8 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
-        buildConfig = true  // ✅ Enables BuildConfig generation
+        buildConfig = true
+        viewBinding = true
     }
 }
 
@@ -51,6 +54,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,4 +66,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-auth:21.0.1")
+    implementation ("androidx.room:room-runtime:2.5.2")
+    kapt("androidx.room:room-compiler:2.5.2")
+    implementation(libs.cloudinary.android)
 }
