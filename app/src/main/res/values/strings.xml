@@ -18,6 +18,7 @@
     <string name="post">Post</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="exit">Exit</string>
     <string name="pickPrice">HELP ME PICK A PRICE</string>
 
 </resources>

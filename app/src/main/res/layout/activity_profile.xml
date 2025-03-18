@@ -13,7 +13,20 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:backgroundTint="#000000"
         android:src="@drawable/baseline_edit_24"
-        android:contentDescription="Edit Profile"
+        android:contentDescription="@string/edit"
+        android:scaleType="centerInside"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_exit"
+        android:layout_margin="16dp"/>
+
+    <ImageButton
+        android:id="@+id/btn_exit"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:backgroundTint="#000000"
+        android:src="@drawable/baseline_exit_to_app_24"
+        android:contentDescription="@string/exit"
         android:scaleType="centerInside"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
