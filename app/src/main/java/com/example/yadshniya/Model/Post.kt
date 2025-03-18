@@ -15,7 +15,7 @@ class Post(
     var id: String,
     var description: String,
     var location: String,
-    var price: Double,
+    var price: Int,
     var userId: String? = null,
     var imageUrl: String? = null,
     var deleted: Boolean? = false,
@@ -89,7 +89,7 @@ class Post(
         fun createPost(postJson: Map<String?, Any?>, docId: String): Post {
             val description = postJson["description"] as String
             val location = postJson["location"] as String
-            val price = postJson["price"] as Double
+            val price = postJson["price"] as Int
             val userId = postJson["userId"] as String?
             val imageUrl = postJson["imageUrl"] as String?
             val isDeleted = postJson["isDeleted"] as Boolean?
@@ -117,8 +117,8 @@ class Post(
             val id = json["id"] as String
             val description = json["description"] as String
             val location = json["location"] as String
-//            val price = json["price"] as Double
-            val price = (json["price"] as? String)?.toDoubleOrNull() ?: 0.0 // Default value if null
+//            val price = json["price"] as Int
+            val price = (json["price"] as? String)?.toIntOrNull() ?: 0 // Default value if null
 
             val userId = json["userId"] as? String?: ""
             val imageUrl = json["imageUrl"] as String

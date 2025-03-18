@@ -23,7 +23,7 @@ class FeedActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.feed_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        postAdapter = PostAdapter(postList)
+        postAdapter = PostAdapter(postList, false)
         recyclerView.adapter = postAdapter
 
         loadPosts()

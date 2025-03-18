@@ -222,7 +222,7 @@ class NewPostActivity : AppCompatActivity() {
     private fun post (){
         val description = findViewById<EditText>(R.id.ed1).text.toString()
         val priceText = findViewById<TextView>(R.id.ed3).text.toString()
-        val price: Double = priceText.toDoubleOrNull() ?: 0.0
+        val price: Int = priceText.toIntOrNull() ?: 0
         val location = findViewById<EditText>(R.id.ed2).text.toString()
         val img = findViewById<ImageButton>(R.id.PicButtonNewPostScreen)
 
