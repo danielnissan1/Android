@@ -15,6 +15,7 @@ class PostAdapter(private val postList: List<Post>) : RecyclerView.Adapter<PostA
         val postImage: ImageView = view.findViewById(R.id.post_image)
         val itemDescription: TextView = view.findViewById(R.id.item_description)
         val itemPrice: TextView = view.findViewById(R.id.item_price)
+        val itemLocation: TextView = view.findViewById(R.id.item_location)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -26,12 +27,12 @@ class PostAdapter(private val postList: List<Post>) : RecyclerView.Adapter<PostA
         val post = postList[position]
         holder.ownerName.text = post.userId ?: "Unknown User"
         holder.itemDescription.text = post.description
-        holder.itemPrice.text = "$${post.id}" // Update this if needed
+        holder.itemPrice.text = "${post.id}₪" // Update this if needed
+        holder.itemLocation.text = post.location
 
-        // ✅ Load image with Picasso
         Picasso.get()
-            .load(post.imageUrl) // URL from Firestore
-            .placeholder(R.drawable.sample_post) // Image while loading
+            .load(post.imageUrl)
+            .placeholder(R.drawable.sample_post)
             .error(R.drawable.sample_post) // Image if loading fails
             .into(holder.postImage)
     }

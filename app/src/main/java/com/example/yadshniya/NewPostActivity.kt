@@ -221,11 +221,12 @@ class NewPostActivity : AppCompatActivity() {
 
     private fun post (){
         val description = findViewById<EditText>(R.id.ed1).text.toString()
-        val price = findViewById<TextView>(R.id.ed3).text.toString()
+        val priceText = findViewById<TextView>(R.id.ed3).text.toString()
+        val price: Double = priceText.toDoubleOrNull() ?: 0.0
         val location = findViewById<EditText>(R.id.ed2).text.toString()
         val img = findViewById<ImageButton>(R.id.PicButtonNewPostScreen)
 
-        if (description.isEmpty() || price.isEmpty() || location.isEmpty()) {
+        if (description.isEmpty() || priceText.isEmpty() || location.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             return
         } else {
@@ -234,7 +235,7 @@ class NewPostActivity : AppCompatActivity() {
             val drawable = img.drawable
             if (drawable is BitmapDrawable) {
                 val imageBitmap = drawable.bitmap
-                instance().createPost(Post(description, location, price), imageBitmap) {
+                instance().createPost(Post(id = "0", description = description, location = location, price = price), imageBitmap) {
 
                 }
             }

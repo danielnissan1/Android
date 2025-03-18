@@ -12,13 +12,14 @@ import com.google.firebase.firestore.GeoPoint
 @Entity
 class Post(
     @PrimaryKey
-            var id: String,
-            var description: String,
-            var location: String,
-            var userId: String? = null,
-            var imageUrl: String? = null,
-            var deleted: Boolean? = false,
-            var lastUpdated: Long = 0) {
+    var id: String,
+    var description: String,
+    var location: String,
+    var price: Double,
+    var userId: String? = null,
+    var imageUrl: String? = null,
+    var deleted: Boolean? = false,
+    var lastUpdated: Long = 0) {
 
 
 //    constructor(
@@ -56,6 +57,7 @@ class Post(
         json["id"] = id
         json["description"] = description
         json["location"] = location
+        json["price"] = price
         json["userId"] = userId
         json["imageUrl"] = imageUrl
         json["isDeleted"] = deleted
@@ -87,6 +89,7 @@ class Post(
         fun createPost(postJson: Map<String?, Any?>, docId: String): Post {
             val description = postJson["description"] as String
             val location = postJson["location"] as String
+            val price = postJson["price"] as Double
             val userId = postJson["userId"] as String?
             val imageUrl = postJson["imageUrl"] as String?
             val isDeleted = postJson["isDeleted"] as Boolean?
@@ -98,6 +101,7 @@ class Post(
                 docId,
                 description,
                 location,
+                price,
                 userId,
                 imageUrl,
                 isDeleted,
@@ -113,6 +117,9 @@ class Post(
             val id = json["id"] as String
             val description = json["description"] as String
             val location = json["location"] as String
+//            val price = json["price"] as Double
+            val price = (json["price"] as? String)?.toDoubleOrNull() ?: 0.0 // Default value if null
+
             val userId = json["userId"] as? String?: ""
             val imageUrl = json["imageUrl"] as String
             val deleted = json["isDeleted"] as Boolean
@@ -122,6 +129,7 @@ class Post(
                 id = id,
                 description = description,
                 location = location,
+                price = price,
                 userId = userId,
                 imageUrl = imageUrl,
                 deleted = deleted,
