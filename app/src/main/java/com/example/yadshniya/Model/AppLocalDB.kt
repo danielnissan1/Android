@@ -18,7 +18,7 @@ abstract class AppLocalDbRepository : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppLocalDbRepository? = null
 
-            fun getDatabase(context: Context): AppLocalDbRepository {
+        fun getDatabase(context: Context): AppLocalDbRepository {
             return INSTANCE ?: synchronized(this)
             {
                 val instance = Room.databaseBuilder(

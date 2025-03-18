@@ -103,7 +103,7 @@ class Model private constructor() {
     }
 
     fun login(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {
-            firebaseModel.login(email, password, listener)
+        firebaseModel.login(email, password, listener)
     }
 
 //    val isSignedIn: Boolean

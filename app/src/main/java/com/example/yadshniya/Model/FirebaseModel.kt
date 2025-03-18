@@ -133,18 +133,18 @@ class FirebaseModel internal constructor() {
             }
     }
 
-    fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
-        db.collection(User.COLLECTION_NAME)
-            .document(email!!)
-            .get()
-            .addOnCompleteListener { task: Task<DocumentSnapshot?> ->
-                var user: User? = null
-                if (task.isSuccessful and (task.result != null)) {
-                    user = task.result!!.data?.let { User.createUser(it) }
+        fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
+            db.collection(User.COLLECTION_NAME)
+                .document(email!!)
+                .get()
+                .addOnCompleteListener { task: Task<DocumentSnapshot?> ->
+                    var user: User? = null
+                    if (task.isSuccessful and (task.result != null)) {
+                        user = task.result!!.data?.let { User.createUser(it) }
+                    }
+                    listener(user as FirebaseUser)
                 }
-                listener(user as FirebaseUser)
-            }
-    }
+        }
 
 
 
@@ -180,4 +180,4 @@ class FirebaseModel internal constructor() {
 //            .addOnSuccessListener { unused: Void? -> listener.onComplete(null) }
 //            .addOnFailureListener { e: Exception? -> listener.onComplete(null) }
 //    }
-}
+    }}
