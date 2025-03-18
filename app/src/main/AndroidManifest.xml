@@ -31,6 +31,8 @@
         </activity>
         <activity android:name="com.example.yadshniya.RegisterActivity" android:exported="true">
         </activity>
+        <activity android:name="com.example.yadshniya.ProfileActivity" android:exported="true">
+        </activity>
     </application>
 
 </manifest>
