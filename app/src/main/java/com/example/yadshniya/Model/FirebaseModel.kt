@@ -122,6 +122,16 @@ class FirebaseModel internal constructor() {
 //            .addOnSuccessListener { unused: Void? -> listener(user) }
 //            .addOnFailureListener { e: Exception? -> listener(user) }
 //    }
+    }
+
+    fun createPost(post: Post, callback: EmptyCallback) {
+        val postJson = post.toJson()
+        db.collection(Post.COLLECTION_NAME).document(post.id)
+            .set(postJson)
+            .addOnCompleteListener{
+                callback()
+            }
+    }
 
         fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
             db.collection(User.COLLECTION_NAME)
@@ -135,6 +145,8 @@ class FirebaseModel internal constructor() {
                     listener(user as FirebaseUser)
                 }
         }
+
+
 
 //    fun getAllMaslulimSince(since: Long?, callback: Model.Listener<List<Maslul>?>) {
 //        db.collection(Maslul.COLLECTION_NAME)
