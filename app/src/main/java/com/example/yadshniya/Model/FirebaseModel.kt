@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.widget.Toast
 import com.example.yadshniya.EmptyCallback
 import com.example.yadshniya.MyApplication
+import com.example.yadshniya.PostsCallback
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -131,6 +132,23 @@ class FirebaseModel internal constructor() {
             .addOnCompleteListener{
                 callback()
             }
+    }
+
+    fun getAllPosts(callback: PostsCallback) {
+        db.collection(Post.COLLECTION_NAME).get()
+            .addOnCompleteListener {
+                when (it.isSuccessful) {
+                    true -> {
+                        val students: MutableList<Post> = mutableListOf()
+                        for (json in it.result) {
+                            students.add(Post.fromJSON(json.data))
+                        }
+                        callback(students)
+                    }
+                    false -> callback(listOf())
+                }
+            }
+
     }
 
     fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {

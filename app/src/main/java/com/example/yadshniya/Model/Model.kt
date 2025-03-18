@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.yadshniya.CloudinaryCallback
 import com.example.yadshniya.EmptyCallback
 import com.example.yadshniya.MyApplication
+import com.example.yadshniya.PostsCallback
 import com.google.firebase.auth.FirebaseUser
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -145,6 +146,12 @@ class Model private constructor() {
             }
         } ?: callback()
     }
+
+    fun getAllPosts(callback: PostsCallback) {
+        firebaseModel.getAllPosts(callback)
+    }
+
+
 
 //    fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
 //            firebaseModel.getUserById(email, listener)

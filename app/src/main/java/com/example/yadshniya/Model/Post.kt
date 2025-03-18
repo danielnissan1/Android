@@ -64,6 +64,7 @@ class Post(
         return json
     }
 
+
     companion object {
         const val COLLECTION_NAME: String = "post"
         const val LAST_UPDATED: String = "lastUpdated"
@@ -108,5 +109,25 @@ class Post(
             postItem.deleted = isDeleted
             return postItem
         }
+        fun fromJSON(json: Map<String, Any>): Post {
+            val id = json["id"] as String
+            val description = json["description"] as String
+            val location = json["location"] as String
+            val userId = json["userId"] as? String?: ""
+            val imageUrl = json["imageUrl"] as String
+            val deleted = json["isDeleted"] as Boolean
+            val lastUpdated = (json[LAST_UPDATED] as Timestamp).seconds
+
+            return Post(
+                id = id,
+                description = description,
+                location = location,
+                userId = userId,
+                imageUrl = imageUrl,
+                deleted = deleted,
+                lastUpdated = lastUpdated
+            )
+        }
+
     }
 }
