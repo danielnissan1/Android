@@ -108,13 +108,13 @@ class FirebaseModel internal constructor() {
             }
     }
 
-    fun createUser(user: User, listener: (FirebaseUser?) -> Unit) {
+    fun createUser(user: User, listener: (User?) -> Unit) {
         val userJson = user.toJson()
         db.collection(User.COLLECTION_NAME)
             .document(user.email!!)
             .set(userJson)
-            .addOnSuccessListener { unused: Void? -> listener(user as FirebaseUser) }
-            .addOnFailureListener { e: Exception? -> listener(user as FirebaseUser) }
+            .addOnSuccessListener { unused: Void? -> listener(user) }
+            .addOnFailureListener { e: Exception? -> listener(user) }
     }
 
     fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {

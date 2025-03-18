@@ -6,6 +6,7 @@ import android.os.Looper
 import androidx.core.os.HandlerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.yadshniya.MyApplication
 import com.google.firebase.auth.FirebaseUser
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -19,7 +20,7 @@ class Model private constructor() {
     private val firebaseModel: FirebaseModel = FirebaseModel()
     var executor: Executor = Executors.newFixedThreadPool(1)
     var mainThread: Handler = HandlerCompat.createAsync(Looper.getMainLooper())
-    var localDb: AppLocalDbRepository = AppLocalDb.appDb
+    var localDb: AppLocalDbRepository = AppLocalDbRepository.getDatabase(MyApplication.context)
 
     val EventPostsListLoadingState: MutableLiveData<PostsListLoadingState> =
         MutableLiveData(PostsListLoadingState.NOT_LOADING)
@@ -109,7 +110,7 @@ class Model private constructor() {
 //        firebaseModel.signOut()
 //    }
 
-    fun createUser(user: User, listener: (FirebaseUser?) -> Unit) {
+    fun createUser(user: User, listener: (User?) -> Unit) {
         firebaseModel.createUser(user, listener)
     }
 
