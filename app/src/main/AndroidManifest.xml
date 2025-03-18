@@ -41,6 +41,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.example.yadshniya.ProfileActivity" android:exported="true">
+        </activity>
     </application>
 
 </manifest>
