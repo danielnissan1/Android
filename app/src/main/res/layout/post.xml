@@ -43,7 +43,7 @@
         android:layout_marginTop="4dp"/>
 
     <ImageButton
-        android:id="@+id/btn_edit"
+        android:id="@+id/btn_edit_post"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:background="?attr/selectableItemBackgroundBorderless"
@@ -51,11 +51,11 @@
         android:contentDescription="@string/edit"
         app:tint="@color/black"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_delete"
+        app:layout_constraintEnd_toStartOf="@+id/btn_delete_post"
         android:layout_marginEnd="8dp"/>
 
     <ImageButton
-        android:id="@+id/btn_delete"
+        android:id="@+id/btn_delete_post"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:background="?attr/selectableItemBackgroundBorderless"
@@ -87,7 +87,8 @@
         app:layout_constraintTop_toBottomOf="@id/post_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp"
+        android:visibility="visible"/>
 
     <TextView
         android:id="@+id/item_price"
@@ -99,6 +100,7 @@
         android:textColor="@color/black"
         app:layout_constraintTop_toBottomOf="@id/item_description"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp"
+        android:visibility="visible"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
