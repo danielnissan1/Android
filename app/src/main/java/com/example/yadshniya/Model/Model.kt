@@ -132,6 +132,20 @@ class Model private constructor() {
         } ?: callback()
     }
 
+    fun createPost(post: Post, img:Bitmap?, callback: EmptyCallback) {
+        firebaseModel.createPost(post) {
+            callback()
+        }
+        img?.let {
+            cloudinaryModel.uploadBitmap(it) { url ->
+                if (!url.isNullOrEmpty()) {
+                    post.imageUrl = url
+                    firebaseModel.createPost(post, callback)
+                }
+            }
+        } ?: callback()
+    }
+
 //    fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
 //            firebaseModel.getUserById(email, listener)
 //    }

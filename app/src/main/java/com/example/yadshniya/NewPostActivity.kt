@@ -1,6 +1,7 @@
 package com.example.yadshniya
 
 import android.content.Intent
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -21,6 +22,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.yadshniya.Model.Model.Companion.instance
+import com.example.yadshniya.Model.Post
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,6 +54,11 @@ class NewPostActivity : AppCompatActivity() {
         val descriptionEditText = findViewById<EditText>(R.id.ed1)
         val pickPriceButton = findViewById<Button>(R.id.pickPrice)
         val priceRecommendationTextView = findViewById<TextView>(R.id.txt3)
+
+        val postButton = findViewById<Button>(R.id.postButton)
+        postButton.setOnClickListener() {
+            post()
+        }
 
         // Initially, set the Pick Price button visibility to GONE
         pickPriceButton.visibility = View.GONE
@@ -210,6 +218,30 @@ class NewPostActivity : AppCompatActivity() {
         }
 
     }
+
+    private fun post (){
+        val description = findViewById<EditText>(R.id.ed1).text.toString()
+        val price = findViewById<TextView>(R.id.ed3).text.toString()
+        val location = findViewById<EditText>(R.id.ed2).text.toString()
+        val img = findViewById<ImageButton>(R.id.PicButtonNewPostScreen)
+
+        if (description.isEmpty() || price.isEmpty() || location.isEmpty()) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+            return
+        } else {
+
+//            TODO: add user
+            val drawable = img.drawable
+            if (drawable is BitmapDrawable) {
+                val imageBitmap = drawable.bitmap
+                instance().createPost(Post(description, location, price), imageBitmap) {
+
+                }
+            }
+        }
+
+    }
+
 
 
 }

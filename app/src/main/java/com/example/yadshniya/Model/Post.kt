@@ -10,39 +10,40 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.GeoPoint
 
 @Entity
-class Post {
+class Post(
     @PrimaryKey
-    var id: String
-    var description: String
-    var location: String?
-    var userId: String?
-    var imageUrl: String? = null
-    var deleted: Boolean?
-    var lastUpdated: Long = 0
+            var id: String,
+            var description: String,
+            var location: String,
+            var userId: String? = null,
+            var imageUrl: String? = null,
+            var deleted: Boolean? = false,
+            var lastUpdated: Long = 0) {
 
-    constructor(
-        id: String,
-        description: String,
-        location: String?,
-        userId: String?,
 
-    ) {
-        this.id = id
-        this.description = description
-        this.location = location
-        this.userId = userId
-        this.deleted = false
-        this.lastUpdated = 0
-
-    }
-
-    constructor() {
-        this.id = ""
-        this.description = ""
-        this.location = ""
-        this.userId = ""
-        this.deleted = false
-    }
+//    constructor(
+//        id: String,
+//        description: String,
+//        location: String?,
+//        userId: String?,
+//
+//    ) {
+//        this.id = id
+//        this.description = description
+//        this.location = location
+//        this.userId = userId
+//        this.deleted = false
+//        this.lastUpdated = 0
+//
+//    }
+//
+//    constructor() {
+//        this.id = ""
+//        this.description = ""
+//        this.location = ""
+//        this.userId = ""
+//        this.deleted = false
+//    }
 
     enum class Difficulty {
         Easy,
@@ -84,7 +85,7 @@ class Post {
 
         fun createPost(postJson: Map<String?, Any?>, docId: String): Post {
             val description = postJson["description"] as String
-            val location = postJson["location"] as String?
+            val location = postJson["location"] as String
             val userId = postJson["userId"] as String?
             val imageUrl = postJson["imageUrl"] as String?
             val isDeleted = postJson["isDeleted"] as Boolean?
@@ -97,6 +98,8 @@ class Post {
                 description,
                 location,
                 userId,
+                imageUrl,
+                isDeleted,
             )
 
             postItem.lastUpdated = lastUpdated
