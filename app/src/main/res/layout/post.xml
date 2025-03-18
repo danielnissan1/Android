@@ -31,7 +31,7 @@
         android:layout_marginStart="8dp"/>
 
     <ImageButton
-        android:id="@+id/btn_edit"
+        android:id="@+id/btn_edit_post"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:background="?attr/selectableItemBackgroundBorderless"
@@ -39,11 +39,11 @@
         android:contentDescription="@string/edit"
         app:tint="@color/black"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_delete"
+        app:layout_constraintEnd_toStartOf="@+id/btn_delete_post"
         android:layout_marginEnd="8dp"/>
 
     <ImageButton
-        android:id="@+id/btn_delete"
+        android:id="@+id/btn_delete_post"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:background="?attr/selectableItemBackgroundBorderless"
