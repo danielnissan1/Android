@@ -30,6 +30,18 @@
         app:layout_constraintTop_toTopOf="@id/profile_image"
         android:layout_marginStart="8dp"/>
 
+    <!-- New Location TextView under name -->
+    <TextView
+        android:id="@+id/item_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New York"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/owner_name"
+        app:layout_constraintStart_toStartOf="@id/owner_name"
+        android:layout_marginTop="4dp"/>
+
     <ImageButton
         android:id="@+id/btn_edit_post"
         android:layout_width="32dp"
