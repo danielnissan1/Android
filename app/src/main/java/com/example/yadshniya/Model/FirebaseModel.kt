@@ -126,8 +126,13 @@ class FirebaseModel internal constructor() {
     }
 
     fun createPost(post: Post, callback: EmptyCallback) {
+
+        // Generate an auto ID
+        val postRef = db.collection("posts").document()
+        val postId = postRef.id  // Generated ID
+        post.id = postId
         val postJson = post.toJson()
-        db.collection(Post.COLLECTION_NAME).document(post.id)
+        db.collection(Post.COLLECTION_NAME).document(postId)
             .set(postJson)
             .addOnCompleteListener{
                 callback()
