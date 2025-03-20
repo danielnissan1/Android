@@ -6,10 +6,10 @@
     android:id="@+id/nav_graph">
     <fragment
         android:id="@+id/feedFragment"
-        android:name="com.example.yadshniya.Fragments.feedFragment"
-        android:label="feed"
-        tools:layout="@layout/activity_feed">
-        <action
+        android:name="com.example.yadshniya.Fragments.FeedFragment"
+        android:label="Feed"
+        tools:layout="@layout/activity_feed" >
+    <action
             android:id="@+id/action_to_feed_Tab"
             app:destination="@id/feedFragment" />
     </fragment>

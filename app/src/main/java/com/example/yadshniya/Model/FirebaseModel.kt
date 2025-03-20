@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.widget.Toast
 import com.example.yadshniya.EmptyCallback
 import com.example.yadshniya.MyApplication
+import com.example.yadshniya.PostsCallback
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -128,23 +129,40 @@ class FirebaseModel internal constructor() {
         val postJson = post.toJson()
         db.collection(Post.COLLECTION_NAME).document(post.id)
             .set(postJson)
-            .addOnCompleteListener {
+            .addOnCompleteListener{
                 callback()
             }
     }
 
-    fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
-        db.collection(User.COLLECTION_NAME)
-            .document(email!!)
-            .get()
-            .addOnCompleteListener { task: Task<DocumentSnapshot?> ->
-                var user: User? = null
-                if (task.isSuccessful and (task.result != null)) {
-                    user = task.result!!.data?.let { User.createUser(it) }
+    fun getAllPosts(callback: PostsCallback) {
+        db.collection(Post.COLLECTION_NAME).get()
+            .addOnCompleteListener {
+                when (it.isSuccessful) {
+                    true -> {
+                        val students: MutableList<Post> = mutableListOf()
+                        for (json in it.result) {
+                            students.add(Post.fromJSON(json.data))
+                        }
+                        callback(students)
+                    }
+                    false -> callback(listOf())
                 }
-                listener(user as FirebaseUser)
             }
+
     }
+
+        fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
+            db.collection(User.COLLECTION_NAME)
+                .document(email!!)
+                .get()
+                .addOnCompleteListener { task: Task<DocumentSnapshot?> ->
+                    var user: User? = null
+                    if (task.isSuccessful and (task.result != null)) {
+                        user = task.result!!.data?.let { User.createUser(it) }
+                    }
+                    listener(user as FirebaseUser)
+                }
+        }
 
 
 //    fun getAllMaslulimSince(since: Long?, callback: Model.Listener<List<Maslul>?>) {
@@ -179,4 +197,4 @@ class FirebaseModel internal constructor() {
 //            .addOnSuccessListener { unused: Void? -> listener.onComplete(null) }
 //            .addOnFailureListener { e: Exception? -> listener.onComplete(null) }
 //    }
-}
+    }
