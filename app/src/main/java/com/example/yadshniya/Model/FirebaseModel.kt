@@ -110,6 +110,9 @@ class FirebaseModel internal constructor() {
     }
 
     fun createUser(user: User, callback: EmptyCallback) {
+        val userRef = db.collection("posts").document()
+        user.id = userRef.id
+
         val userJson = user.toJson()
         db.collection(User.COLLECTION_NAME).document(user.email!!)
             .set(userJson)
@@ -126,8 +129,6 @@ class FirebaseModel internal constructor() {
     }
 
     fun createPost(post: Post, callback: EmptyCallback) {
-
-        // Generate an auto ID
         val postRef = db.collection("posts").document()
         val postId = postRef.id  // Generated ID
         post.id = postId
