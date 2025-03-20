@@ -45,7 +45,7 @@ class PostAdapter(private val posts: List<Post>, private val isProfileScreen: Bo
         val itemDescription: TextView = itemView.findViewById(R.id.item_description)
         val itemPrice: TextView = itemView.findViewById(R.id.item_price)
         val postImage: ImageView = itemView.findViewById(R.id.post_image)
-        val btnEdit: ImageButton = itemView.findViewById(R.id.btn_edit)
-        val btnDelete: ImageButton = itemView.findViewById(R.id.btn_delete)
+        val btnEdit: ImageButton = itemView.findViewById(R.id.btn_edit_post)
+        val btnDelete: ImageButton = itemView.findViewById(R.id.btn_delete_post)
     }
 }
