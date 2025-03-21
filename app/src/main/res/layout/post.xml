@@ -94,7 +94,7 @@
         android:id="@+id/item_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="$120"
+        android:text="120₪"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@color/black"

@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.fragment.findNavController
 import com.example.yadshniya.BuildConfig
 import com.example.yadshniya.Model.Model.Companion.instance
 import com.example.yadshniya.Model.Post
@@ -37,7 +38,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 
-class newPostFragment : Fragment() {
+class NewPostFragment : Fragment() {
 
     private lateinit var root: View
     private lateinit var pickImageButton: ImageButton
@@ -224,9 +225,10 @@ class newPostFragment : Fragment() {
             if (drawable is BitmapDrawable) {
                 val imageBitmap = drawable.bitmap
                 instance().createPost(Post(id = "0", description = description, location = location, price = price), imageBitmap) {
-                    // Handle post response here
+                    findNavController().navigate(R.id.feedFragment)
                 }
             }
+
         }
     }
 }
