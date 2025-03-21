@@ -101,38 +101,6 @@ class Model private constructor() {
         return allPosts?:localDb.PostDao().getAll()
     }
 
-//    fun refreshAllPosts() {
-////        reviewsListLoadingState.value = LoadingState.LOADING
-//
-////        val lastUpdated: Long = Review.lastUpdated
-//
-//        firebaseModel.getAllPosts () { list ->
-//            if (list != null) {
-//                for (post in list) {
-//                    if (post.isDeleted) {
-//                        reviewsExecutor.execute {
-//                            database.reviewDao().delete(review)
-//                        }
-//                    } else {
-//                        firebaseModel.getImage(review.id) { uri ->
-//                            reviewsExecutor.execute {
-//                                review.reviewImage = uri.toString()
-//                                database.reviewDao().insert(review)
-//                            }
-//                        }
-//
-//                        review.timestamp?.let {
-//                            if (time < it) time = review.timestamp ?: System.currentTimeMillis()
-//                        }
-//                        Review.lastUpdated = time
-//                    }
-//                }
-//            }
-//            reviewsListLoadingState.postValue(LoadingState.LOADED)
-//        }
-//    }
-
-
     fun register(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {
         firebaseModel.register(email, password, listener)
     }
