@@ -110,7 +110,7 @@ class FirebaseModel internal constructor() {
     }
 
     fun createUser(user: User, callback: EmptyCallback) {
-        val userRef = db.collection("posts").document()
+        val userRef = db.collection(User.COLLECTION_NAME).document()
         user.id = userRef.id
 
         val userJson = user.toJson()
@@ -129,7 +129,7 @@ class FirebaseModel internal constructor() {
     }
 
     fun createPost(post: Post, callback: EmptyCallback) {
-        val postRef = db.collection("posts").document()
+        val postRef = db.collection(Post.COLLECTION_NAME).document()
         val postId = postRef.id  // Generated ID
         post.id = postId
         val postJson = post.toJson()
@@ -140,16 +140,17 @@ class FirebaseModel internal constructor() {
             }
     }
 
+
     fun getAllPosts(callback: PostsCallback) {
         db.collection(Post.COLLECTION_NAME).get()
             .addOnCompleteListener {
                 when (it.isSuccessful) {
                     true -> {
-                        val students: MutableList<Post> = mutableListOf()
+                        val posts: MutableList<Post> = mutableListOf()
                         for (json in it.result) {
-                            students.add(Post.fromJSON(json.data))
+                            posts.add(Post.fromJSON(json.data))
                         }
-                        callback(students)
+                        callback(posts)
                     }
                     false -> callback(listOf())
                 }

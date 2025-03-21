@@ -10,10 +10,10 @@ import androidx.room.Query
 
 @Dao
 interface PostDao {
-    @Query("select * from Post")
-    fun getAll(): LiveData<List<Post?>>
+    @Query("select * from Post order by lastUpdated desc")
+    fun getAll(): LiveData<List<Post>>
 
-    @Query("select * from Post where userId = :userId")
+    @Query("select * from Post where userId = :userId order by lastUpdated desc")
     fun getPostsByUser(userId: String?): LiveData<List<Post>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

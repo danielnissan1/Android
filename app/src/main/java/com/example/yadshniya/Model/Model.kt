@@ -3,16 +3,16 @@ package com.example.yadshniya.Model
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.core.os.HandlerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.yadshniya.CloudinaryCallback
 import com.example.yadshniya.EmptyCallback
 import com.example.yadshniya.MyApplication
-import com.example.yadshniya.PostsCallback
 import com.google.firebase.auth.FirebaseUser
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+
 
 class Model private constructor() {
     enum class PostsListLoadingState {
@@ -38,14 +38,9 @@ class Model private constructor() {
 
     private var myPostsList: LiveData<List<Post>>? = null
 
-    val allPosts: LiveData<List<Post?>>?
-        get() {
-            if (allPostsList == null) {
-                allPostsList = localDb.PostDao()?.getAll()
-//                refreshAllMaslulim()
-            }
-            return allPostsList
-        }
+    private val allPosts
+    : LiveData<List<Post>>? = null
+
 
     val MyPost: LiveData<List<Post>>?
         get() {
@@ -56,40 +51,43 @@ class Model private constructor() {
             return myPostsList
         }
 
-//    fun refreshAllPosts() {
-//        EventPostsListLoadingState.value = PostsListLoadingState.LOADING
-//
-//        // get local last update
-////        val localLastUpdate: Long = Post.getLocalLastUpdate()
-//
-//        // get all updated records from firebase since local last update
-//        firebaseModel.getAllMaslulimSince(localLastUpdate) { list ->
-//            executor.execute {
+    fun refreshAllPosts() {
+        EventPostsListLoadingState.setValue(PostsListLoadingState.LOADING)
+
+        // get local last update
+        val localLastUpdate: Long? = Post.localLastUpdate
+
+        // get all updated records from firebase since local last update
+        firebaseModel.getAllPosts() { list ->
+            executor.execute {
 //                Log.d("TAG", " firebase return : " + list.size())
-//                var time = localLastUpdate
-//                for (maslul in list) {
-//                    // insert new records into ROOM
-//                    if (maslul.getDeleted()) {
-//                        localDb.maslulDao().delete(maslul)
-//                    } else {
-//                        localDb.maslulDao().insertAll(maslul)
-//                    }
-//
-//                    if (time < maslul.getLastUpdated()) {
-//                        time = maslul.getLastUpdated()
-//                    }
-//                }
-//                try {
-//                    Thread.sleep(3000)
-//                } catch (e: InterruptedException) {
-//                    e.printStackTrace()
-//                }
-//                // update local last update
-//                Maslul.setLocalLastUpdate(time)
-//                EventMaslulimListLoadingState.postValue(MaslulimListLoadingState.NOT_LOADING)
-//            }
-//        }
-//    }
+                var time = localLastUpdate
+                    for (post in list!!) {
+                        // insert new records into ROOM
+                            if (post!!.deleted == true) {
+                                localDb.PostDao().delete(post)
+                            } else {
+                                localDb.PostDao().insertAll(post)
+                            }
+
+
+                                if (time!! < (post.lastUpdated)) {
+                                    time = post.lastUpdated
+                                }
+
+
+                }
+                try {
+                    Thread.sleep(3000)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+                // update local last update
+                Post.localLastUpdate = time
+                EventPostsListLoadingState.postValue(PostsListLoadingState.NOT_LOADING)
+            }
+        }
+    }
 
 //    fun addMaslul(maslul: Maslul, listener: Listener<Void?>) {
 //        maslul.setUserId(userEmail)
@@ -98,6 +96,10 @@ class Model private constructor() {
 //            listener.onComplete(null)
 //        }
 //    }
+
+    fun getAllPosts(): LiveData<List<Post>> {
+        return allPosts?:localDb.PostDao().getAll()
+    }
 
     fun register(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {
         firebaseModel.register(email, password, listener)
@@ -134,9 +136,6 @@ class Model private constructor() {
     }
 
     fun createPost(post: Post, img:Bitmap?, callback: EmptyCallback) {
-        firebaseModel.createPost(post) {
-            callback()
-        }
         img?.let {
             cloudinaryModel.uploadBitmap(it) { url ->
                 if (!url.isNullOrEmpty()) {
@@ -147,9 +146,9 @@ class Model private constructor() {
         } ?: callback()
     }
 
-    fun getAllPosts(callback: PostsCallback) {
-        firebaseModel.getAllPosts(callback)
-    }
+//    fun getAllPosts(callback: PostsCallback) {
+//        firebaseModel.getAllPosts(callback)
+//    }
 
 
 

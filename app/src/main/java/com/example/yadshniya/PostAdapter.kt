@@ -9,7 +9,8 @@ import com.example.yadshniya.Model.Post
 import com.example.yadshniya.R
 import com.squareup.picasso.Picasso
 
-class PostAdapter(private val posts: List<Post>, private val isProfileScreen: Boolean) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+class PostAdapter(private var posts: MutableList<Post>, private val isProfileScreen: Boolean) :
+    RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.post, parent, false)
@@ -22,12 +23,10 @@ class PostAdapter(private val posts: List<Post>, private val isProfileScreen: Bo
         holder.ownerName.text = post.userId
         holder.itemLocation.text = post.location
         holder.itemDescription.text = post.description
-        holder.itemPrice.text = "$${post.price}"
+        holder.itemPrice.text = "${post.price}₪"
 
-        // Load image using Picasso
         Picasso.get().load(post.imageUrl).into(holder.postImage)
 
-        // Show or hide buttons based on the screen
         if (isProfileScreen) {
             holder.btnEdit.visibility = View.VISIBLE
             holder.btnDelete.visibility = View.VISIBLE
@@ -38,6 +37,12 @@ class PostAdapter(private val posts: List<Post>, private val isProfileScreen: Bo
     }
 
     override fun getItemCount(): Int = posts.size
+
+    fun updatePosts(newPosts: List<Post>) {
+        posts.clear()
+        posts.addAll(newPosts)
+        notifyDataSetChanged()
+    }
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ownerName: TextView = itemView.findViewById(R.id.owner_name)
