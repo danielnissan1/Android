@@ -1,5 +1,6 @@
 package com.example.yadshniya.Fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,12 +9,17 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.yadshniya.LoginActivity
 import com.example.yadshniya.R
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 class ProfileFragment : Fragment() {
     private lateinit var root: View
     private var isEditing = false
+    private var auth = Firebase.auth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -78,13 +84,15 @@ class ProfileFragment : Fragment() {
         // Exit Button Click Listener
         exitButton.setOnClickListener {
             Log.d("ProfileFragment", "Exit button clicked! Exiting edit mode.")
-            username.text = editUsername.text.toString()
-            email.text = editEmail.text.toString()
-            username.visibility = View.VISIBLE
-            email.visibility = View.VISIBLE
-            editUsername.visibility = View.GONE
-            editEmail.visibility = View.GONE
-            isEditing = false
+            auth.signOut()
+            Toast.makeText(
+                requireContext(), "Logged out", Toast.LENGTH_SHORT
+            ).show()
+
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            activity?.finish()
         }
     }
 }
