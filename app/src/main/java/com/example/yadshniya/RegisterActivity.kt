@@ -166,8 +166,6 @@ private lateinit var binding: ActivityRegisterBinding
                     val imageView = findViewById<ImageButton>(R.id.profilePicButtonSignUpScreen)
 //                    val imageView = binding.profilePicButtonSignUpScreen
 
-                        Log.d("RegisterActivity", "Image view: $imageView")
-
                     val drawable = imageView.drawable
                     if (drawable is BitmapDrawable) {
                         val imageBitmap = drawable.bitmap
