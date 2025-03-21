@@ -22,7 +22,7 @@ class PostAdapter(private val posts: List<Post>, private val isProfileScreen: Bo
         holder.ownerName.text = post.userId
         holder.itemLocation.text = post.location
         holder.itemDescription.text = post.description
-        holder.itemPrice.text = "$${post.price}"
+        holder.itemPrice.text = "${post.price}₪"
 
         // Load image using Picasso
         Picasso.get().load(post.imageUrl).into(holder.postImage)

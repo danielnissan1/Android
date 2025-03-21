@@ -118,8 +118,12 @@ class Post(
             val description = json["description"] as String
             val location = json["location"] as String
 //            val price = json["price"] as Int
-            val price = (json["price"] as? String)?.toIntOrNull() ?: 0 // Default value if null
-
+            val price = when (val priceValue = json["price"]) {
+                is Int -> priceValue // If it's already an integer
+                is Double -> priceValue.toInt() // If it's a Double, convert to Int
+                is String -> priceValue.toIntOrNull() ?: 0 // If it's a string, convert to int
+                else -> 0 // Default value if neither type is found
+            }
             val userId = json["userId"] as? String?: ""
             val imageUrl = json["imageUrl"] as String
             val deleted = json["isDeleted"] as Boolean
