@@ -35,8 +35,10 @@
             app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/image_view2" />
+
+
         <EditText
-            android:id="@+id/logtxt"
+            android:id="@+id/email_login"
             android:layout_width="320dp"
             android:layout_height="50dp"
             android:layout_marginTop="35dp"
@@ -47,8 +49,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text1"
             />
+
         <EditText
-            android:id="@+id/ed3"
+            android:id="@+id/password_login"
             android:layout_width="320dp"
             android:layout_height="50dp"
             android:layout_marginTop="35dp"
@@ -59,7 +62,7 @@
             android:longClickable="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/logtxt"
+            app:layout_constraintTop_toBottomOf="@+id/email_login"
             />
         <Button
             android:id="@+id/btn_login"
@@ -73,7 +76,7 @@
             android:backgroundTint="@color/baby_pink"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ed3"
+            app:layout_constraintTop_toBottomOf="@+id/password_login"
             />
         <LinearLayout
             android:id="@+id/lin2"

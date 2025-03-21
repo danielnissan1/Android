@@ -169,7 +169,7 @@ private lateinit var binding: ActivityRegisterBinding
                     val drawable = imageView.drawable
                     if (drawable is BitmapDrawable) {
                         val imageBitmap = drawable.bitmap
-Log.d("RegisterActivity", "Image bitmap: $imageBitmap")
+                        Log.d("RegisterActivity", "Image bitmap: $imageBitmap")
                         // Add to storage account and save url
 //                        instance()
 //                            .uploadImage(email, imageBitmap) { url ->
