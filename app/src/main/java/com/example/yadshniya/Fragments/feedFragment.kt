@@ -13,21 +13,36 @@ import com.example.yadshniya.Model.Model.Companion.instance
 import com.example.yadshniya.Model.Post
 import com.example.yadshniya.R
 
-class FeedFragment : Fragment(R.layout.activity_feed) {
+class FeedFragment : Fragment() {
 
+    private lateinit var root: View
     private lateinit var recyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
     private var postList: MutableList<Post> = mutableListOf()
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        // Inflate the layout manually
+        root = inflater.inflate(R.layout.activity_feed, container, false)
+        return root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d("FeedFragment", "Fragment Loaded Successfully")
 
+        // Initialize RecyclerView
+        recyclerView = root.findViewById(R.id.feed_recycler_view)
         recyclerView = view.findViewById(R.id.feed_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         postAdapter = PostAdapter(postList, false)
         recyclerView.adapter = postAdapter
+        recyclerView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+    }
 
+    override fun onResume() {
+        super.onResume()
         loadPosts()
     }
 
@@ -43,6 +58,7 @@ class FeedFragment : Fragment(R.layout.activity_feed) {
                 postList.addAll(nonNullPosts)
             }
 
+            Log.i("FeedFragment", "Updated postList: ${postList.size}")
             postAdapter.notifyDataSetChanged()
         })
     }
