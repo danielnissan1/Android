@@ -140,6 +140,7 @@ class FirebaseModel internal constructor() {
             }
     }
 
+
     fun getAllPosts(callback: PostsCallback) {
         db.collection(Post.COLLECTION_NAME).get()
             .addOnCompleteListener {

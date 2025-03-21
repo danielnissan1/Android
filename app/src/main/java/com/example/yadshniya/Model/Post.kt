@@ -120,10 +120,10 @@ class Post(
 //            val price = json["price"] as Int
             val price = when (val priceValue = json["price"]) {
                 is Int -> priceValue
-                is Long -> priceValue.toInt()// If it's already an integer
-                is Double -> priceValue.toInt() // If it's a Double, convert to Int
-                is String -> priceValue.toIntOrNull() ?: 0 // If it's a string, convert to int
-                else -> 0 // Default value if neither type is found
+                is Long -> priceValue.toInt()
+                is Double -> priceValue.toInt()
+                is String -> priceValue.toIntOrNull() ?: 0
+                else -> 0
             }
             val userId = json["userId"] as? String?: ""
             val imageUrl = json["imageUrl"] as String
