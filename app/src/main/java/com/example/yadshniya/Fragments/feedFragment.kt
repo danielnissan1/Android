@@ -25,6 +25,7 @@ class FeedFragment : Fragment(R.layout.activity_feed) {
 
         recyclerView = view.findViewById(R.id.feed_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+//        recyclerView.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
         postAdapter = PostAdapter(postList, false)
         recyclerView.adapter = postAdapter
 
