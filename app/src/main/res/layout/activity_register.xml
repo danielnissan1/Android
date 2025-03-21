@@ -87,19 +87,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameTextfield" />
 
-    <EditText
-        android:id="@+id/ed3"
-        android:layout_width="320dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="20dp"
-        android:hint="@string/phoneNumber"
-        android:inputType="textPassword"
-        android:longClickable="false"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordTextfield" />
+
 
     <Button
         android:id="@+id/registerButton"
@@ -113,7 +101,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ed3" />
+        app:layout_constraintTop_toBottomOf="@+id/passwordTextfield" />
 
     <TextView
         android:id="@+id/t1"
