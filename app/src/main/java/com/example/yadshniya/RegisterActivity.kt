@@ -160,7 +160,7 @@ private lateinit var binding: ActivityRegisterBinding
             instance().register(email, password)
             { user ->
                 if (user != null) {
-                    val newUser = User(name, email)
+                    val newUser = User(userName = name, email = email)
 
                     if (pickProfileImageButton.drawable != null) {
                     val imageView = findViewById<ImageButton>(R.id.profilePicButtonSignUpScreen)
