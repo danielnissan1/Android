@@ -37,7 +37,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 
-class newPostFragment : Fragment() {
+class NewPostFragment : Fragment() {
 
     private lateinit var root: View
     private lateinit var pickImageButton: ImageButton

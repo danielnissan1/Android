@@ -41,7 +41,7 @@ class Model private constructor() {
     val allPosts: LiveData<List<Post?>>?
         get() {
             if (allPostsList == null) {
-                allPostsList = localDb.PostDao()?.getAll()
+                allPostsList = localDb.PostDao().getAll()
 //                refreshAllMaslulim()
             }
             return allPostsList
@@ -134,9 +134,6 @@ class Model private constructor() {
     }
 
     fun createPost(post: Post, img:Bitmap?, callback: EmptyCallback) {
-        firebaseModel.createPost(post) {
-            callback()
-        }
         img?.let {
             cloudinaryModel.uploadBitmap(it) { url ->
                 if (!url.isNullOrEmpty()) {
