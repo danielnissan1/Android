@@ -11,8 +11,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.yadshniya.R
 
-class ProfileFragment : Fragment(R.layout.activity_profile) {
-
+class ProfileFragment : Fragment() {
     private lateinit var root: View
     private var isEditing = false
 
