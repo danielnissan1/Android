@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 
@@ -24,46 +25,11 @@ class FirebaseModel internal constructor() {
 
     init {
         val settings = FirebaseFirestoreSettings.Builder()
-            .build()  // No need to set persistence explicitly
+            .build()
         db.firestoreSettings = settings
         storage = FirebaseStorage.getInstance()
         auth = FirebaseAuth.getInstance()
     }
-
-//    fun uploadImage(name: String, bitmap: Bitmap, listener: (String?) -> Unit) {
-//        val storageRef = storage.reference
-//        val imagesRef = storageRef.child("images/$name.jpg")
-//        val baos = ByteArrayOutputStream()
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-//        val data = baos.toByteArray()
-//
-//        val uploadTask = imagesRef.putBytes(data)
-//        uploadTask.addOnFailureListener { listener(null) }
-//            .addOnSuccessListener {
-//                imagesRef.downloadUrl.addOnSuccessListener { uri ->
-//                    listener(uri.toString())
-////                    val user = FirebaseAuth.getInstance().currentUser
-////
-////                    if (user != null) {
-////                        val profileUpdates = UserProfileChangeRequest.Builder()
-////                            .setPhotoUri(uri)
-////                            .build()
-////
-////                        user.updateProfile(profileUpdates)
-////                            .addOnCompleteListener { task ->
-////                                if (task.isSuccessful) {
-////                                    listener(user) // Return updated FirebaseUser
-////                                } else {
-////                                    listener(null)
-////                                }
-////                            }
-////                    } else {
-////                        listener(null)
-////                    }
-//                }
-//            }
-//
-//    }
 
     val isSignedIn: Boolean
         get() {
@@ -121,89 +87,126 @@ class FirebaseModel internal constructor() {
             .addOnCompleteListener {
                 callback()
             }
-//        val userJson = user.toJson()
-//        db.collection(User.COLLECTION_NAME)
-//            .document(user.email!!)
-//            .set(userJson)
-//            .addOnSuccessListener { unused: Void? -> listener(user) }
-//            .addOnFailureListener { e: Exception? -> listener(user) }
-//    }
     }
 
+
     fun createPost(post: Post, callback: EmptyCallback) {
-        val postRef = db.collection(Post.COLLECTION_NAME).document()
-        val postId = postRef.id  // Generated ID
-        post.id = postId
-        val postJson = post.toJson()
-        db.collection(Post.COLLECTION_NAME).document(postId)
-            .set(postJson)
-            .addOnCompleteListener{
-                callback()
+        val currentUser = auth.currentUser
+
+        if (currentUser != null) {
+            Log.d("TAG", "User ID: ${currentUser.uid}")
+            Log.d("TAG", "User Email: ${currentUser.email}")
+            Log.d("TAG", "User Display Name: ${currentUser.displayName}")
+
+            getUserByEmail(currentUser.email!!) { user ->
+                if (user != null) {
+                    post.userId = user.id
+                    Log.d("TAG", "Fetched User ID: ${user.id}")
+
+                    val postRef = db.collection(Post.COLLECTION_NAME).document()
+                    val postId = postRef.id
+                    post.id = postId
+
+                    val postJson = post.toJson()
+
+                    postRef.set(postJson)
+                        .addOnCompleteListener {
+                            callback()
+                        }
+                } else {
+                    Log.d("TAG", "User with email ${currentUser.email} not found")
+                }
+            }
+        } else {
+            Log.d("TAG", "No user is logged in")
+        }
+    }
+
+    fun getUserByEmail(email: String, callback: (User?) -> Unit) {
+        db.collection(User.COLLECTION_NAME)
+            .whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    // Assuming there's only one user with the given email
+                    val user = querySnapshot.documents[0].toObject(User::class.java)
+                    callback(user)
+                } else {
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("TAG", "Error fetching user: ", exception)
+                callback(null)
             }
     }
+
 
 
     fun getAllPosts(callback: PostsCallback) {
-        db.collection(Post.COLLECTION_NAME).get()
-            .addOnCompleteListener {
-                when (it.isSuccessful) {
-                    true -> {
-                        val posts: MutableList<Post> = mutableListOf()
-                        for (json in it.result) {
-                            posts.add(Post.fromJSON(json.data))
+        db.collection(Post.COLLECTION_NAME).get(Source.SERVER)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val posts: MutableList<Post> = mutableListOf()
+                    val postDocuments = task.result!!.documents
+
+                    if (postDocuments.isNotEmpty()) {
+                        val postFetchCount = postDocuments.size
+                        var completedPosts = 0
+
+                        for (doc in postDocuments) {
+                            val post = Post.fromJSON(doc.data!!)
+
+                            db.collection(User.COLLECTION_NAME)
+                                .whereEqualTo("id", post.userId)
+                                .get()
+                                .addOnSuccessListener { userQuerySnapshot ->
+                                    if (!userQuerySnapshot.isEmpty) {
+                                        val userDoc = userQuerySnapshot.documents[0]
+                                        post.ownerName = userDoc.getString("userName") ?: "Unknown"
+                                        post.ownerImageUrl = userDoc.getString("imageUrl") ?: ""
+                                    }
+
+                                    posts.add(post)
+                                    completedPosts++
+
+                                    if (completedPosts == postFetchCount) {
+                                        callback(posts)
+                                    }
+                                }
+                                .addOnFailureListener {
+                                    completedPosts++
+                                    if (completedPosts == postFetchCount) {
+                                        callback(posts)
+                                    }
+                                }
                         }
+                    } else {
                         callback(posts)
                     }
-                    false -> callback(listOf())
+                } else {
+                    callback(listOf())
                 }
             }
-
     }
 
-        fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
-            db.collection(User.COLLECTION_NAME)
-                .document(email!!)
-                .get()
-                .addOnCompleteListener { task: Task<DocumentSnapshot?> ->
-                    var user: User? = null
-                    if (task.isSuccessful and (task.result != null)) {
-                        user = task.result!!.data?.let { User.createUser(it) }
-                    }
-                    listener(user as FirebaseUser)
+
+    fun getUserById(userId: String, callback: (User?) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val user = document.toObject(User::class.java)
+                    callback(user)
+                } else {
+                    Log.e("FirebaseModel", "User with ID $userId not found")
+                    callback(null)  // Return null instead of crashing
                 }
-        }
-
-
-//    fun getAllMaslulimSince(since: Long?, callback: Model.Listener<List<Maslul>?>) {
-//        db.collection(Maslul.COLLECTION_NAME)
-//            .whereGreaterThanOrEqualTo(Maslul.LAST_UPDATED, Timestamp(since!!, 0))
-//            .get()
-//            .addOnCompleteListener(OnCompleteListener<QuerySnapshot> { task ->
-//                val list: MutableList<Maslul> = LinkedList<Maslul>()
-//                if (task.isSuccessful) {
-//                    val jsonsList = task.result
-//                    for (json in jsonsList) {
-//                        val maslul: Maslul = Maslul.createMaslul(json.data, json.id)
-//                        list.add(maslul)
-//                    }
-//                }
-//                callback.onComplete(list)
-//            })
-//    }
-//
-//    fun saveMaslul(maslul: Maslul, listener: Model.Listener<Void?>) {
-//        // Add maslul case - get new free id
-//        var maslulId: String = maslul.getId()
-//        if (maslulId == "") {
-//            val rootRef = FirebaseFirestore.getInstance()
-//            val maslulsRef = rootRef.collection(Maslul.COLLECTION_NAME)
-//            maslulId = maslulsRef.document().id
-//        }
-//
-//        db.collection(Maslul.COLLECTION_NAME)
-//            .document(maslulId)
-//            .set(maslul.toJson())
-//            .addOnSuccessListener { unused: Void? -> listener.onComplete(null) }
-//            .addOnFailureListener { e: Exception? -> listener.onComplete(null) }
-//    }
+            }
+            .addOnFailureListener { e ->
+                Log.e("FirebaseModel", "Error fetching user", e)
+                callback(null)
+            }
     }
+}

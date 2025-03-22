@@ -6,9 +6,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.yadshniya.MyApplication
 
-@Database(entities = [Post::class], version = 3)
+@Database(entities = [Post::class], version = 4)
 //@TypeConverters([Converters::class])
 abstract class AppLocalDbRepository : RoomDatabase() {
     abstract fun PostDao(): PostDao
@@ -19,18 +21,19 @@ abstract class AppLocalDbRepository : RoomDatabase() {
         private var INSTANCE: AppLocalDbRepository? = null
 
         fun getDatabase(context: Context): AppLocalDbRepository {
-            return INSTANCE ?: synchronized(this)
-            {
+            return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppLocalDbRepository::class.java,
                     "dbFileName.db"
                 )
+                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance
             }
         }
+
 //            get() = Room.databaseBuilder(
 //                MyApplication.context,
 //                AppLocalDbRepository::class.java,

@@ -20,12 +20,18 @@ class PostAdapter(private var posts: MutableList<Post>, private val isProfileScr
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = posts[position]
 
-        holder.ownerName.text = post.userId
+        holder.ownerName.text = post.ownerName
         holder.itemLocation.text = post.location
         holder.itemDescription.text = post.description
         holder.itemPrice.text = "${post.price}₪"
 
         Picasso.get().load(post.imageUrl).into(holder.postImage)
+
+        if (!post.ownerImageUrl.isNullOrEmpty()) {
+            Picasso.get().load(post.ownerImageUrl).into(holder.ownerImage)
+        } else {
+            holder.ownerImage.setImageResource(R.drawable.sample_profile)
+        }
 
         if (isProfileScreen) {
             holder.btnEdit.visibility = View.VISIBLE
@@ -50,6 +56,7 @@ class PostAdapter(private var posts: MutableList<Post>, private val isProfileScr
         val itemDescription: TextView = itemView.findViewById(R.id.item_description)
         val itemPrice: TextView = itemView.findViewById(R.id.item_price)
         val postImage: ImageView = itemView.findViewById(R.id.post_image)
+        val ownerImage: ImageView = itemView.findViewById(R.id.profile_image)
         val btnEdit: ImageButton = itemView.findViewById(R.id.btn_edit_post)
         val btnDelete: ImageButton = itemView.findViewById(R.id.btn_delete_post)
     }
