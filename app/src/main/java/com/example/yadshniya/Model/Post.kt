@@ -19,7 +19,10 @@ class Post(
     var userId: String? = null,
     var imageUrl: String? = null,
     var deleted: Boolean? = false,
-    var lastUpdated: Long = 0) {
+    var lastUpdated: Long = 0,
+
+    var ownerName: String? = null,
+    var ownerImageUrl: String? = null) {
 
 
 //    constructor(
@@ -114,7 +117,7 @@ class Post(
             return postItem
         }
         fun fromJSON(json: Map<String, Any>): Post {
-            val id = json["id"] as String
+              val id = json["id"] as String
             val description = json["description"] as String
             val location = json["location"] as String
 //            val price = json["price"] as Int

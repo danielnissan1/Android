@@ -1,6 +1,11 @@
 package com.example.yadshniya.Model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
 class User(
+    @PrimaryKey
     var id: String? = null,
     var userName: String? = null,
     var email: String? = null,

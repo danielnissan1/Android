@@ -54,48 +54,49 @@ class Model private constructor() {
     fun refreshAllPosts() {
         EventPostsListLoadingState.setValue(PostsListLoadingState.LOADING)
 
-        // get local last update
         val localLastUpdate: Long? = Post.localLastUpdate
 
-        // get all updated records from firebase since local last update
         firebaseModel.getAllPosts() { list ->
             executor.execute {
-//                Log.d("TAG", " firebase return : " + list.size())
                 var time = localLastUpdate
-                    for (post in list!!) {
-                        // insert new records into ROOM
-                            if (post!!.deleted == true) {
-                                localDb.PostDao().delete(post)
-                            } else {
+
+//                localDb.PostDao().deleteAll()
+
+                for (post in list!!) {
+                    if (post!!.deleted == true) {
+                        localDb.PostDao().delete(post)
+                    } else {
+                        firebaseModel.getUserById(post.userId!!) { user ->
+                            if (user != null) {
+                                post.ownerImageUrl = user.imageUrl
+                                post.ownerName = user.userName
+
+                            }
+                            executor.execute {
                                 localDb.PostDao().insertAll(post)
                             }
+                        }
+                    }
 
-
-                                if (time!! < (post.lastUpdated)) {
-                                    time = post.lastUpdated
-                                }
-
-
+                    if (time!! < post.lastUpdated) {
+                        time = post.lastUpdated
+                    }
                 }
+
                 try {
                     Thread.sleep(3000)
                 } catch (e: InterruptedException) {
                     e.printStackTrace()
                 }
-                // update local last update
+
                 Post.localLastUpdate = time
                 EventPostsListLoadingState.postValue(PostsListLoadingState.NOT_LOADING)
             }
         }
-    }
 
-//    fun addMaslul(maslul: Maslul, listener: Listener<Void?>) {
-//        maslul.setUserId(userEmail)
-//        firebaseModel.saveMaslul(maslul) { Void ->
-//            refreshAllMaslulim()
-//            listener.onComplete(null)
-//        }
-//    }
+
+
+}
 
     fun getAllPosts(): LiveData<List<Post>> {
         return allPosts?:localDb.PostDao().getAll()
