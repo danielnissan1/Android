@@ -1,5 +1,6 @@
 package com.example.yadshniya
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +8,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
@@ -19,26 +21,19 @@ class MainActivity : AppCompatActivity() {
 //            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
 //            insets
 //        }
-        setContentView(R.layout.main_screen)
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) {
+            // No user is logged in, move to login page
+            navigateToLogin()
+        } else {
+            // User is logged in, continue with the main UI
+            setContentView(R.layout.main_screen)
+            setUI()
+        }
+
+//        setContentView(R.layout.main_screen)
         setUI()
-
-        FirebaseApp.initializeApp(this)
-        val db = FirebaseFirestore.getInstance()
-
-        val user = hashMapOf(
-            "name" to "John Doe",
-            "email" to "johndoe@example.com",
-            "age" to 25
-        )
-
-        db.collection("users").document("user1")
-            .set(user)
-            .addOnSuccessListener {
-                Log.d("Firestore", "User added successfully!")
-            }
-            .addOnFailureListener { e ->
-                Log.e("Firestore", "Error adding user", e)
-            }
 
     }
 
@@ -47,5 +42,11 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         val navController = navHostFragment.navController
         NavigationUI.setupWithNavController(bottomNavigationView, navController)
+    }
+
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
