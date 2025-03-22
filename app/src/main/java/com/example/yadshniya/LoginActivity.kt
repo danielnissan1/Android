@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginActivity: AppCompatActivity() {
     private var auth = Firebase.auth
@@ -80,11 +81,19 @@ class LoginActivity: AppCompatActivity() {
     }
 
     private fun loggedInHandler() {
-        Toast.makeText(
-            this@LoginActivity, "Welcome ${auth.currentUser?.displayName}!", Toast.LENGTH_SHORT
-        ).show()
-        val intent = Intent(this@LoginActivity, MainActivity::class.java)
-        startActivity(intent)
-        finish()
+        val db = FirebaseFirestore.getInstance()
+        val userRef = db.collection("users").document(auth.currentUser?.email!!)
+
+        userRef.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val userName = task.result?.getString("userName")
+                Toast.makeText(
+                    this@LoginActivity, "Welcome ${userName}!", Toast.LENGTH_SHORT
+                ).show()
+                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+        }
     }
 }

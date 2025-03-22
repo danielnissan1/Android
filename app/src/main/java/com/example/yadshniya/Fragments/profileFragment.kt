@@ -81,43 +81,37 @@ class ProfileFragment : Fragment() {
         val exitButton = root.findViewById<ImageButton>(R.id.btn_exit_user)
         val editButton = root.findViewById<ImageButton>(R.id.btn_edit_user)
         val username = root.findViewById<TextView>(R.id.profile_username)
-        val email = root.findViewById<TextView>(R.id.profile_email)
 
         val editUsername = EditText(requireContext())
-        val editEmail = EditText(requireContext())
 
         editUsername.layoutParams = username.layoutParams
         editUsername.setText(username.text)
         editUsername.textSize = username.textSize
         editUsername.visibility = View.GONE
 
-        editEmail.layoutParams = email.layoutParams
-        editEmail.setText(email.text)
-        editEmail.textSize = email.textSize
-        editEmail.visibility = View.GONE
-
         (username.parent as ViewGroup).addView(editUsername)
-        (email.parent as ViewGroup).addView(editEmail)
 
         // Edit profile logic
         editButton.setOnClickListener {
             Log.d("ProfileFragment", "Edit button clicked! isEditing: $isEditing")
             if (isEditing) {
+                editButton.setImageResource(R.drawable.baseline_edit_24)
+
                 // Save changes & switch to View Mode
                 username.text = editUsername.text.toString()
-                email.text = editEmail.text.toString()
                 username.visibility = View.VISIBLE
-                email.visibility = View.VISIBLE
                 editUsername.visibility = View.GONE
-                editEmail.visibility = View.GONE
+
+                updateUserInFirestore(editUsername.text.toString())
             } else {
-                // Switch to Edit Mode
+                editButton.setImageResource(R.drawable.baseline_done_24)
+
                 editUsername.setText(username.text)
-                editEmail.setText(email.text)
                 username.visibility = View.GONE
-                email.visibility = View.GONE
                 editUsername.visibility = View.VISIBLE
-                editEmail.visibility = View.VISIBLE
+
+                editUsername.textSize = 14f
+
                 editUsername.requestFocus()
             }
             isEditing = !isEditing // Toggle state
@@ -136,5 +130,33 @@ class ProfileFragment : Fragment() {
             startActivity(intent)
             activity?.finish()
         }
+    }
+
+    private fun updateUserInFirestore(username: String) {
+        //TODO: updates the details in the firebase but not the login
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            val db = FirebaseFirestore.getInstance()
+            val userRef = db.collection("users").document(currentUser.email!!)
+
+            // Create a map with the expected types
+            val updatedData: Map<String, Any> = hashMapOf(
+                "userName" to username,
+            )
+
+            // Update Firestore document
+            userRef.update(updatedData)
+                .addOnSuccessListener {
+                    Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_SHORT).show()
+                    Log.d("ProfileFragment", "User details updated successfully in Firestore.")
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show()
+                    Log.e("ProfileFragment", "Error updating user details in Firestore", e)
+                }
+        } else {
+            Toast.makeText(requireContext(), "No user is logged in", Toast.LENGTH_SHORT).show()
+        }
+
     }
 }
