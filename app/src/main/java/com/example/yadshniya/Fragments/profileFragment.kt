@@ -34,9 +34,9 @@ class ProfileFragment : Fragment() {
     private var auth = Firebase.auth
 
     private lateinit var pickProfileImageButton: ImageButton
-    private lateinit var imageSelectionCallBack: ActivityResultLauncher<Intent>
     private var imageURI: Uri? = null
-    private var selectedBitmap: Bitmap? = null
+    private lateinit var imageSelectionCallBack: ActivityResultLauncher<Intent>
+//    private var selectedBitmap: Bitmap? = null
 
 
     override fun onCreateView(
@@ -95,10 +95,10 @@ class ProfileFragment : Fragment() {
         val username = root.findViewById<TextView>(R.id.profile_username)
         pickProfileImageButton = root.findViewById<ImageButton>(R.id.profileImage)
 
-//        defineImageSelectionCallBack()
+        defineImageSelectionCallBack()
         pickProfileImageButton.setOnClickListener {
             Log.i("buttonClick", "pick profile pick button in profile screen clicked")
-//            openGallery()
+            openGallery()
         }
         pickProfileImageButton.isEnabled = false
 
@@ -240,44 +240,44 @@ class ProfileFragment : Fragment() {
 //    }
 
 
-//    private fun defineImageSelectionCallBack() {
-//        imageSelectionCallBack =
-//            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-//                try {
-//                    val imageUri: Uri? = result.data?.data
-//                    Log.d("ImageSelection", "Image URI: $imageUri")
-//
-//                    if (imageUri != null) {
-//                        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri)
-//                        val imageSizeInBytes = bitmap.byteCount.toLong() // Size in bytes
-//                        val maxCanvasSize = 5 * 1024 * 1024 // 5MB
-//
-//                        if (imageSizeInBytes > maxCanvasSize) {
-//                            Log.e("ImageSelection", "Selected image is too large")
-//                            Toast.makeText(requireContext(), "Selected image is too large", Toast.LENGTH_SHORT).show()
-//                        } else {
-//                            Log.d("ImageSelection", "Setting image to button")
-//                            pickProfileImageButton.setImageBitmap(bitmap)
-//                            imageURI = imageUri  // Store the URI if you need it
-//                            Log.d("ImageSelection", "Image successfully set")
-//                        }
-//                    } else {
-//                        Log.e("ImageSelection", "No image selected")
-//                        Toast.makeText(requireContext(), "No Image Selected", Toast.LENGTH_SHORT).show()
-//                    }
-//                } catch (e: Exception) {
-//                    Log.e("ImageSelection", "Error processing image: ${e.message}")
-//                    Toast.makeText(requireContext(), "Error processing result", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//    }
+    private fun defineImageSelectionCallBack() {
+        imageSelectionCallBack =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+                try {
+                    val imageUri: Uri? = result.data?.data
+                    Log.d("ImageSelection", "Image URI: $imageUri")
+
+                    if (imageUri != null) {
+                        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri)
+                        val imageSizeInBytes = bitmap.byteCount.toLong() // Size in bytes
+                        val maxCanvasSize = 5 * 1024 * 1024 // 5MB
+
+                        if (imageSizeInBytes > maxCanvasSize) {
+                            Log.e("ImageSelection", "Selected image is too large")
+                            Toast.makeText(requireContext(), "Selected image is too large", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.d("ImageSelection", "Setting image to button")
+                            pickProfileImageButton.setImageBitmap(bitmap)
+                            imageURI = imageUri  // Store the URI if you need it
+                            Log.d("ImageSelection", "Image successfully set")
+                        }
+                    } else {
+                        Log.e("ImageSelection", "No image selected")
+                        Toast.makeText(requireContext(), "No Image Selected", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Log.e("ImageSelection", "Error processing image: ${e.message}")
+                    Toast.makeText(requireContext(), "Error processing result", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
 
 
-//    private fun openGallery() {
-//        val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
-//        imageSelectionCallBack.launch(intent)
-//    }
-//
+    private fun openGallery() {
+        val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
+        imageSelectionCallBack.launch(intent)
+    }
+
 //    private fun getBitmapSize(bitmap: Bitmap): Int {
 //        return bitmap.byteCount
 //    }
