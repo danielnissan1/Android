@@ -95,10 +95,10 @@ class ProfileFragment : Fragment() {
         val username = root.findViewById<TextView>(R.id.profile_username)
         pickProfileImageButton = root.findViewById<ImageButton>(R.id.profileImage)
 
-        defineImageSelectionCallBack()
+//        defineImageSelectionCallBack()
         pickProfileImageButton.setOnClickListener {
             Log.i("buttonClick", "pick profile pick button in profile screen clicked")
-            openGallery()
+//            openGallery()
         }
         pickProfileImageButton.isEnabled = false
 
@@ -162,25 +162,32 @@ class ProfileFragment : Fragment() {
             val userRef = db.collection("users").document(currentUser.email!!)
 
             Log.d("profile", "selected image: $imageURI")
-            if (selectedBitmap != null) {
-                uploadImageToFirebaseStorage(selectedBitmap!!) { imageUrl ->
-                    val updatedData: Map<String, Any> = hashMapOf(
-                        "userName" to username,
-                        "imageUrl" to imageUrl // Save image URL in Firestore
-                    )
-                    userRef.update(updatedData)
-                        .addOnSuccessListener {
-                            Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_SHORT).show()
-                            Log.d("ProfileFragment", "User details updated successfully in Firestore.")
-                        }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show()
-                            Log.e("ProfileFragment", "Error updating user details in Firestore", e)
-                        }
-                }
-            } else {
+
+            // Check if a new profile image is selected
+//            if (imageURI != null) {
+//                uploadImageToFirebaseStorage(imageURI!!) { imageUrl ->
+//                    Log.d("profile", "image url: $imageUrl")
+//                    val updatedData: Map<String, Any> = hashMapOf(
+//                        "userName" to username,
+//                        "imageUrl" to imageUrl // Save image URL in Firestore
+//                    )
+//                    Log.d("profile", "updated data with imageurl: $imageUrl")
+//
+//                    // Update Firestore document
+//                    userRef.update(updatedData)
+//                        .addOnSuccessListener {
+//                            Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_SHORT).show()
+//                            Log.d("ProfileFragment", "User details updated successfully in Firestore.")
+//                        }
+//                        .addOnFailureListener { e ->
+//                            Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show()
+//                            Log.e("ProfileFragment", "Error updating user details in Firestore", e)
+//                        }
+//                }
+//            } else {
                 // Update only username if no new image is selected
                 val updatedData: Map<String, Any> = hashMapOf("userName" to username)
+                Log.d("profile", "updated data without image url: $updatedData")
                 userRef.update(updatedData)
                     .addOnSuccessListener {
                         Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_SHORT).show()
@@ -191,83 +198,88 @@ class ProfileFragment : Fragment() {
                         Log.e("ProfileFragment", "Error updating user details in Firestore", e)
                     }
             }
-        } else {
-            Toast.makeText(requireContext(), "No user is logged in", Toast.LENGTH_SHORT).show()
-        }
+//        } else {
+//            Toast.makeText(requireContext(), "No user is logged in", Toast.LENGTH_SHORT).show()
+//        }
     }
 
-    private fun uploadImageToFirebaseStorage(bitmap: Bitmap, onSuccess: (String) -> Unit) {
-        val storageRef = FirebaseStorage.getInstance().reference
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-        if (userId == null) {
-            Log.e("FirebaseStorage", "User not authenticated")
-            Toast.makeText(requireContext(), "User not authenticated", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        val fileRef = storageRef.child("profile_images/$userId.jpg")
-
-        // Convert Bitmap to ByteArray
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos) // Compress to reduce size
-        val imageData = baos.toByteArray()
-
-        // Upload to Firebase Storage using putBytes()
-        fileRef.putBytes(imageData)
-            .addOnSuccessListener {
-                fileRef.downloadUrl.addOnSuccessListener { uri ->
-                    Log.d("FirebaseStorage", "Image uploaded successfully: $uri")
-                    onSuccess(uri.toString()) // Return download URL
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("FirebaseStorage", "Image upload failed: ${e.message}")
-                Toast.makeText(requireContext(), "Image upload failed: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-    }
-
-    private fun defineImageSelectionCallBack() {
-        imageSelectionCallBack =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-                try {
-                    val imageUri: Uri? = result.data?.data
-                    Log.d("ImageSelection", "Image URI: $imageUri")
-
-                    if (imageUri != null) {
-                        // Convert Uri to Bitmap
-                        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri)
-
-                        // Check file size
-                        val imageSize = getBitmapSize(bitmap)
-                        val maxCanvasSize = 5 * 1024 * 1024 // 5MB
-                        if (imageSize > maxCanvasSize) {
-                            Log.e("ImageSelection", "Selected image is too large")
-                            Toast.makeText(requireContext(), "Selected image is too large", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Log.d("ImageSelection", "Setting image to button")
-                            pickProfileImageButton.setImageBitmap(bitmap)
-                            selectedBitmap = bitmap // Store the bitmap for later upload
-                        }
-                    } else {
-                        Log.e("ImageSelection", "No image selected")
-                        Toast.makeText(requireContext(), "No Image Selected", Toast.LENGTH_SHORT).show()
-                    }
-                } catch (e: Exception) {
-                    Log.e("ImageSelection", "Error processing image: ${e.message}")
-                    Toast.makeText(requireContext(), "Error processing result", Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
+//    private fun uploadImageToFirebaseStorage(imageUri: Uri, onSuccess: (String) -> Unit) {
+//        val storageRef = FirebaseStorage.getInstance().reference
+//        val userId = FirebaseAuth.getInstance().currentUser?.uid
+//
+//        if (userId == null) {
+//            Log.e("FirebaseStorage", "User not authenticated")
+//            Toast.makeText(requireContext(), "User not authenticated", Toast.LENGTH_LONG).show()
+//            return
+//        }
+//
+//        val fileRef = storageRef.child("profile_images/$userId.jpg")
+//        Log.e("FirebaseStorage", "fileRef: $fileRef")
+//        Log.e("FirebaseStorage", "image uri: $imageUri")
+//        Log.e("FirebaseStorage", "user id: $userId")
+//
+//        // Convert Bitmap to ByteArray
+//        val baos = ByteArrayOutputStream()
+//        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri) // Convert Uri to Bitmap
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos) // Compress to reduce size
+//        val imageData = baos.toByteArray()
+//        Log.e("FirebaseStorage", "imagedata: $imageData")
+//
+//        // Upload to Firebase Storage using putBytes()
+//        fileRef.putBytes(imageData)
+//            .addOnSuccessListener {
+//                fileRef.downloadUrl.addOnSuccessListener { uri ->
+//                    Log.d("FirebaseStorage", "Image uploaded successfully: $uri")
+//                    onSuccess(uri.toString()) // Return download URL
+//                }
+//            }
+//            .addOnFailureListener { e ->
+//                Log.e("FirebaseStorage", "Image upload failed: ${e.message}")
+//                Toast.makeText(requireContext(), "Image upload failed: ${e.message}", Toast.LENGTH_LONG).show()
+//            }
+//    }
 
 
-    private fun openGallery() {
-        val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
-        imageSelectionCallBack.launch(intent)
-    }
+//    private fun defineImageSelectionCallBack() {
+//        imageSelectionCallBack =
+//            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+//                try {
+//                    val imageUri: Uri? = result.data?.data
+//                    Log.d("ImageSelection", "Image URI: $imageUri")
+//
+//                    if (imageUri != null) {
+//                        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri)
+//                        val imageSizeInBytes = bitmap.byteCount.toLong() // Size in bytes
+//                        val maxCanvasSize = 5 * 1024 * 1024 // 5MB
+//
+//                        if (imageSizeInBytes > maxCanvasSize) {
+//                            Log.e("ImageSelection", "Selected image is too large")
+//                            Toast.makeText(requireContext(), "Selected image is too large", Toast.LENGTH_SHORT).show()
+//                        } else {
+//                            Log.d("ImageSelection", "Setting image to button")
+//                            pickProfileImageButton.setImageBitmap(bitmap)
+//                            imageURI = imageUri  // Store the URI if you need it
+//                            Log.d("ImageSelection", "Image successfully set")
+//                        }
+//                    } else {
+//                        Log.e("ImageSelection", "No image selected")
+//                        Toast.makeText(requireContext(), "No Image Selected", Toast.LENGTH_SHORT).show()
+//                    }
+//                } catch (e: Exception) {
+//                    Log.e("ImageSelection", "Error processing image: ${e.message}")
+//                    Toast.makeText(requireContext(), "Error processing result", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//    }
 
-    private fun getBitmapSize(bitmap: Bitmap): Int {
-        return bitmap.byteCount
-    }
+
+//    private fun openGallery() {
+//        val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
+//        imageSelectionCallBack.launch(intent)
+//    }
+//
+//    private fun getBitmapSize(bitmap: Bitmap): Int {
+//        return bitmap.byteCount
+//    }
 
 }
