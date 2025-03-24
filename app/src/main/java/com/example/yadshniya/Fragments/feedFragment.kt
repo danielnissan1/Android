@@ -20,7 +20,7 @@ class FeedFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
-//    private var postList: MutableList<Post> = mutableListOf()
+    private lateinit var progressBar: View
     private var viewModel: PostsListViewModel? = null
 
     override fun onAttach(context: Context) {
@@ -38,29 +38,36 @@ class FeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = view.findViewById(R.id.feed_recycler_view)
+        progressBar = view.findViewById(R.id.progressBar)
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        postAdapter = PostAdapter(mutableListOf(), false) // Start with empty list
+        postAdapter = PostAdapter(mutableListOf(), false)
         recyclerView.adapter = postAdapter
 
-        // Observe the posts and update the adapter
-        instance().getAllPosts().observe(viewLifecycleOwner, Observer { posts ->
-            Log.d("FeedFragment", "Fetched ${posts.size} posts")
-            viewModel?.updatePostList(posts)
-            postAdapter.updatePosts(posts)  // ✅ Properly updates the RecyclerView
-        })
+        observePosts() // Observe posts
 
         reloadData()
     }
 
-
+    private fun observePosts() {
+        instance().getAllPosts().observe(viewLifecycleOwner, Observer { posts ->
+            if (posts.isNotEmpty()) {
+                progressBar.visibility = View.GONE // Hide loader when posts are loaded
+                Log.d("FeedFragment", "Fetched ${posts.size} posts")
+                viewModel?.updatePostList(posts)
+                postAdapter.updatePosts(posts)
+            }
+        })
+    }
 
     override fun onResume() {
         super.onResume()
-        reloadData()
+        reloadData() // Reload data to ensure the new post is shown
     }
 
     private fun reloadData() {
+        progressBar.visibility = View.VISIBLE // Show loader before refreshing
         instance().refreshAllPosts()
     }
 }

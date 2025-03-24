@@ -191,9 +191,16 @@ class FirebaseModel internal constructor() {
     }
 
 
-    fun getUserById(userId: String, callback: (User?) -> Unit) {
-        val db = FirebaseFirestore.getInstance()
+    fun getUserById(userId: String?, callback: (User?) -> Unit) {
+        if (userId.isNullOrBlank()) {
+            Log.e("FirebaseModel", "Error: userId is empty or null!")
+            callback(null)
+            return
+        }
 
+        Log.d("FirebaseModel", "Fetching user with ID: $userId")
+
+        val db = FirebaseFirestore.getInstance()
         db.collection("users").document(userId).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
@@ -201,7 +208,7 @@ class FirebaseModel internal constructor() {
                     callback(user)
                 } else {
                     Log.e("FirebaseModel", "User with ID $userId not found")
-                    callback(null)  // Return null instead of crashing
+                    callback(null)
                 }
             }
             .addOnFailureListener { e ->
@@ -209,4 +216,5 @@ class FirebaseModel internal constructor() {
                 callback(null)
             }
     }
+
 }

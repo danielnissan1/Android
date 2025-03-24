@@ -220,10 +220,20 @@ class NewPostFragment : Fragment() {
             Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT).show()
             return
         } else {
+
+            if (imageURI == null) {
+                Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT).show()
+                Log.d("NewPostFragment", "No image selected")
+                return
+            }
+
+            val imageBitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageURI)
+
+
             // Add user
             val drawable = img.drawable
             if (drawable is BitmapDrawable) {
-                val imageBitmap = drawable.bitmap
+//                val imageBitmap = drawable.bitmap
                 instance().createPost(Post(id = "0", description = description, location = location, price = price), imageBitmap) {
                     findNavController().navigate(R.id.feedFragment)
                 }
