@@ -1,8 +1,8 @@
 package com.example.yadshniya.Fragments
 
+import PostAdapter
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
@@ -20,8 +20,12 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.yadshniya.LoginActivity
 import com.example.yadshniya.Model.Model.Companion.instance
+import com.example.yadshniya.Model.Post
 import com.example.yadshniya.Model.User
 import com.example.yadshniya.R
 import com.google.firebase.Firebase
@@ -39,6 +43,10 @@ class ProfileFragment : Fragment() {
     private var imageURI: Uri? = null
     private lateinit var imageSelectionCallBack: ActivityResultLauncher<Intent>
 
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var postAdapter: PostAdapter
+    private var postList: MutableList<Post> = mutableListOf()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -52,6 +60,32 @@ class ProfileFragment : Fragment() {
         Log.i("ProfileFragment", "Profile screen loaded")
         setUserDetails()
         setUI()
+
+        // Initialize RecyclerView
+        recyclerView = requireView().findViewById(R.id.recycler_view_user_posts)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        postAdapter = PostAdapter(postList, false)
+        recyclerView.adapter = postAdapter
+//        recyclerView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+
+        instance().getAllPosts().observe(viewLifecycleOwner, Observer { posts ->
+            Log.d("profileFragment", "Fetched ${posts.size} posts")
+
+            if (posts.isEmpty()) {
+                Log.e("profileFragment", "No posts fetched. Check Firestore query or database.")
+            }
+
+            postList.clear()
+            postList.addAll(posts)
+            postAdapter.notifyDataSetChanged()
+        })
+
+        instance().EventPostsListLoadingState.observe(viewLifecycleOwner, Observer { state ->
+            Log.d("profileFragment", "Loading State: $state")
+        })
+
+        observeData()
+        reloadData()
     }
 
         private fun setUserDetails() {
@@ -213,6 +247,26 @@ class ProfileFragment : Fragment() {
     private fun openGallery() {
         val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
         imageSelectionCallBack.launch(intent)
+    }
+
+    private fun reloadData() {
+        Log.d("profileFragment", "Reloading data...")
+        instance().refreshAllPosts()
+    }
+
+    private fun observeData() {
+        instance().getAllPosts().observe(viewLifecycleOwner, Observer { posts ->
+            Log.d("profileFragment", "Fetched ${posts.size} posts")
+
+            if (posts.isNotEmpty()) {
+                postList.clear()
+                postList.addAll(posts)
+                postAdapter.notifyDataSetChanged()
+                Log.d("profileFragment", "Adapter notified with new data")
+            } else {
+                Log.e("profileFragment", "No posts to display")
+            }
+        })
     }
 
 }
