@@ -1,8 +1,12 @@
 package com.example.yadshniya.Fragments
 
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,20 +16,28 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.example.yadshniya.LoginActivity
+import com.example.yadshniya.Model.Model.Companion.instance
+import com.example.yadshniya.Model.User
 import com.example.yadshniya.R
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
-import java.io.File
 
 class ProfileFragment : Fragment() {
     private lateinit var root: View
     private var isEditing = false
     private var auth = Firebase.auth
+
+    private lateinit var pickProfileImageButton: ImageButton
+    private var imageURI: Uri? = null
+    private lateinit var imageSelectionCallBack: ActivityResultLauncher<Intent>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,6 +93,14 @@ class ProfileFragment : Fragment() {
         val exitButton = root.findViewById<ImageButton>(R.id.btn_exit_user)
         val editButton = root.findViewById<ImageButton>(R.id.btn_edit_user)
         val username = root.findViewById<TextView>(R.id.profile_username)
+        pickProfileImageButton = root.findViewById<ImageButton>(R.id.profileImage)
+
+        defineImageSelectionCallBack()
+        pickProfileImageButton.setOnClickListener {
+            Log.i("buttonClick", "pick profile pick button in profile screen clicked")
+            openGallery()
+        }
+        pickProfileImageButton.isEnabled = false
 
         val editUsername = EditText(requireContext())
 
@@ -103,6 +123,7 @@ class ProfileFragment : Fragment() {
                 editUsername.visibility = View.GONE
 
                 updateUserInFirestore(editUsername.text.toString())
+                pickProfileImageButton.isEnabled = false
             } else {
                 editButton.setImageResource(R.drawable.baseline_done_24)
 
@@ -111,8 +132,10 @@ class ProfileFragment : Fragment() {
                 editUsername.visibility = View.VISIBLE
 
                 editUsername.textSize = 14f
-
                 editUsername.requestFocus()
+
+                pickProfileImageButton.isEnabled = true
+                pickProfileImageButton.alpha = 1.0f
             }
             isEditing = !isEditing // Toggle state
         }
@@ -132,31 +155,64 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private fun updateUserInFirestore(username: String) {
-        //TODO: updates the details in the firebase but not the login
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            val db = FirebaseFirestore.getInstance()
-            val userRef = db.collection("users").document(currentUser.email!!)
+            val email = currentUser.email!!
+            val drawable = pickProfileImageButton.drawable
+            val user = User(email = email, userName = username) // Create a new user object
 
-            // Create a map with the expected types
-            val updatedData: Map<String, Any> = hashMapOf(
-                "userName" to username,
-            )
-
-            // Update Firestore document
-            userRef.update(updatedData)
-                .addOnSuccessListener {
-                    Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_SHORT).show()
-                    Log.d("ProfileFragment", "User details updated successfully in Firestore.")
+            if (drawable is BitmapDrawable) {
+                val imageBitmap = drawable.bitmap
+                instance().updateUser(user, img = imageBitmap) {
+                    Toast.makeText(requireContext(), "Profile updated successfully!", Toast.LENGTH_SHORT).show()
                 }
-                .addOnFailureListener { e ->
-                    Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show()
-                    Log.e("ProfileFragment", "Error updating user details in Firestore", e)
+            } else {
+                instance().updateUser(user, img = null) {
+                    Toast.makeText(requireContext(), "Profile updated successfully!", Toast.LENGTH_SHORT).show()
                 }
-        } else {
-            Toast.makeText(requireContext(), "No user is logged in", Toast.LENGTH_SHORT).show()
+            }
         }
-
     }
+
+
+    private fun defineImageSelectionCallBack() {
+        imageSelectionCallBack =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+                try {
+                    val imageUri: Uri? = result.data?.data
+                    Log.d("ImageSelection", "Image URI: $imageUri")
+
+                    if (imageUri != null) {
+                        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri)
+                        val imageSizeInBytes = bitmap.byteCount.toLong() // Size in bytes
+                        val maxCanvasSize = 5 * 1024 * 1024 // 5MB
+
+                        if (imageSizeInBytes > maxCanvasSize) {
+                            Log.e("ImageSelection", "Selected image is too large")
+                            Toast.makeText(requireContext(), "Selected image is too large", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.d("ImageSelection", "Setting image to button")
+                            pickProfileImageButton.setImageBitmap(bitmap)
+                            imageURI = imageUri  // Store the URI if you need it
+                            Log.d("ImageSelection", "Image successfully set")
+                        }
+                    } else {
+                        Log.e("ImageSelection", "No image selected")
+                        Toast.makeText(requireContext(), "No Image Selected", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Log.e("ImageSelection", "Error processing image: ${e.message}")
+                    Toast.makeText(requireContext(), "Error processing result", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+
+    private fun openGallery() {
+        val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
+        imageSelectionCallBack.launch(intent)
+    }
+
 }
