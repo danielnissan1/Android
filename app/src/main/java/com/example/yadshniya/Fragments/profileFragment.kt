@@ -1,7 +1,9 @@
 package com.example.yadshniya.Fragments
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -19,14 +21,14 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.example.yadshniya.LoginActivity
+import com.example.yadshniya.Model.Model.Companion.instance
+import com.example.yadshniya.Model.User
 import com.example.yadshniya.R
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
-import java.io.ByteArrayOutputStream
 
 class ProfileFragment : Fragment() {
     private lateinit var root: View
@@ -36,8 +38,6 @@ class ProfileFragment : Fragment() {
     private lateinit var pickProfileImageButton: ImageButton
     private var imageURI: Uri? = null
     private lateinit var imageSelectionCallBack: ActivityResultLauncher<Intent>
-//    private var selectedBitmap: Bitmap? = null
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -155,89 +155,26 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private fun updateUserInFirestore(username: String) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            val db = FirebaseFirestore.getInstance()
-            val userRef = db.collection("users").document(currentUser.email!!)
+            val email = currentUser.email!!
+            val drawable = pickProfileImageButton.drawable
+            val user = User(email = email, userName = username) // Create a new user object
 
-            Log.d("profile", "selected image: $imageURI")
-
-            // Check if a new profile image is selected
-//            if (imageURI != null) {
-//                uploadImageToFirebaseStorage(imageURI!!) { imageUrl ->
-//                    Log.d("profile", "image url: $imageUrl")
-//                    val updatedData: Map<String, Any> = hashMapOf(
-//                        "userName" to username,
-//                        "imageUrl" to imageUrl // Save image URL in Firestore
-//                    )
-//                    Log.d("profile", "updated data with imageurl: $imageUrl")
-//
-//                    // Update Firestore document
-//                    userRef.update(updatedData)
-//                        .addOnSuccessListener {
-//                            Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_SHORT).show()
-//                            Log.d("ProfileFragment", "User details updated successfully in Firestore.")
-//                        }
-//                        .addOnFailureListener { e ->
-//                            Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show()
-//                            Log.e("ProfileFragment", "Error updating user details in Firestore", e)
-//                        }
-//                }
-//            } else {
-                // Update only username if no new image is selected
-                val updatedData: Map<String, Any> = hashMapOf("userName" to username)
-                Log.d("profile", "updated data without image url: $updatedData")
-                userRef.update(updatedData)
-                    .addOnSuccessListener {
-                        Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_SHORT).show()
-                        Log.d("ProfileFragment", "User details updated successfully in Firestore.")
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show()
-                        Log.e("ProfileFragment", "Error updating user details in Firestore", e)
-                    }
+            if (drawable is BitmapDrawable) {
+                val imageBitmap = drawable.bitmap
+                instance().updateUser(user, img = imageBitmap) {
+                    Toast.makeText(requireContext(), "Profile updated successfully!", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                instance().updateUser(user, img = null) {
+                    Toast.makeText(requireContext(), "Profile updated successfully!", Toast.LENGTH_SHORT).show()
+                }
             }
-//        } else {
-//            Toast.makeText(requireContext(), "No user is logged in", Toast.LENGTH_SHORT).show()
-//        }
+        }
     }
-
-//    private fun uploadImageToFirebaseStorage(imageUri: Uri, onSuccess: (String) -> Unit) {
-//        val storageRef = FirebaseStorage.getInstance().reference
-//        val userId = FirebaseAuth.getInstance().currentUser?.uid
-//
-//        if (userId == null) {
-//            Log.e("FirebaseStorage", "User not authenticated")
-//            Toast.makeText(requireContext(), "User not authenticated", Toast.LENGTH_LONG).show()
-//            return
-//        }
-//
-//        val fileRef = storageRef.child("profile_images/$userId.jpg")
-//        Log.e("FirebaseStorage", "fileRef: $fileRef")
-//        Log.e("FirebaseStorage", "image uri: $imageUri")
-//        Log.e("FirebaseStorage", "user id: $userId")
-//
-//        // Convert Bitmap to ByteArray
-//        val baos = ByteArrayOutputStream()
-//        val bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageUri) // Convert Uri to Bitmap
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos) // Compress to reduce size
-//        val imageData = baos.toByteArray()
-//        Log.e("FirebaseStorage", "imagedata: $imageData")
-//
-//        // Upload to Firebase Storage using putBytes()
-//        fileRef.putBytes(imageData)
-//            .addOnSuccessListener {
-//                fileRef.downloadUrl.addOnSuccessListener { uri ->
-//                    Log.d("FirebaseStorage", "Image uploaded successfully: $uri")
-//                    onSuccess(uri.toString()) // Return download URL
-//                }
-//            }
-//            .addOnFailureListener { e ->
-//                Log.e("FirebaseStorage", "Image upload failed: ${e.message}")
-//                Toast.makeText(requireContext(), "Image upload failed: ${e.message}", Toast.LENGTH_LONG).show()
-//            }
-//    }
 
 
     private fun defineImageSelectionCallBack() {
@@ -277,9 +214,5 @@ class ProfileFragment : Fragment() {
         val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
         imageSelectionCallBack.launch(intent)
     }
-
-//    private fun getBitmapSize(bitmap: Bitmap): Int {
-//        return bitmap.byteCount
-//    }
 
 }
