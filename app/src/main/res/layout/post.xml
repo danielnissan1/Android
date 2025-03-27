@@ -8,15 +8,16 @@
     android:padding="12dp"
     android:background="@color/white">
 
-    <com.google.android.material.imageview.ShapeableImageView
+    <ImageView
         android:id="@+id/profile_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent"
         android:scaleType="centerCrop"
-        android:src="@drawable/sample_profile" />
+        android:src="@drawable/sample_profile"
+        android:background="@drawable/round_image"
+        android:clipToOutline="true"
+        tools:ignore="MissingConstraints" />
+
 
     <TextView
         android:id="@+id/owner_name"

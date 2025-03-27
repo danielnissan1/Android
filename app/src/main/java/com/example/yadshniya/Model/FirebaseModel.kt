@@ -193,6 +193,7 @@ class FirebaseModel internal constructor() {
                                     }
                                 }
                         }
+                        Log.d("FirebaseModel", "posts in all posts: $posts")
                     } else {
                         callback(posts)
                     }
@@ -201,6 +202,57 @@ class FirebaseModel internal constructor() {
                 }
             }
     }
+
+    fun getCurrentUserPosts(currentUserId: String, callback: PostsCallback) {
+        db.collection(Post.COLLECTION_NAME)
+            .whereEqualTo("userId", currentUserId) // Filter posts by current user ID
+            .get(Source.SERVER)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val posts: MutableList<Post> = mutableListOf()
+                    val postDocuments = task.result!!.documents
+
+                    if (postDocuments.isNotEmpty()) {
+                        val postFetchCount = postDocuments.size
+                        var completedPosts = 0
+
+                        for (doc in postDocuments) {
+                            val post = Post.fromJSON(doc.data!!)
+
+                            db.collection(User.COLLECTION_NAME)
+                                .whereEqualTo("id", post.userId)
+                                .get()
+                                .addOnSuccessListener { userQuerySnapshot ->
+                                    if (!userQuerySnapshot.isEmpty) {
+                                        val userDoc = userQuerySnapshot.documents[0]
+                                        post.ownerName = userDoc.getString("userName") ?: "Unknown"
+                                        post.ownerImageUrl = userDoc.getString("imageUrl") ?: ""
+                                    }
+
+                                    posts.add(post)
+                                    completedPosts++
+
+                                    if (completedPosts == postFetchCount) {
+                                        callback(posts)
+                                    }
+                                }
+                                .addOnFailureListener {
+                                    completedPosts++
+                                    if (completedPosts == postFetchCount) {
+                                        callback(posts)
+                                    }
+                                }
+                        }
+                        Log.d("FirebaseModel", "posts in current user posts: $posts")
+                    } else {
+                        callback(posts)
+                    }
+                } else {
+                    callback(listOf())
+                }
+            }
+    }
+
 
 
     fun getUserById(userId: String?, callback: (User?) -> Unit) {

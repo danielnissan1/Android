@@ -3,7 +3,6 @@ package com.example.yadshniya.Model
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.core.os.HandlerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -34,12 +33,14 @@ class Model private constructor() {
         fun onComplete(data: T)
     }
 
-    private var allPostsList: LiveData<List<Post?>>? = null
+    private var userPostsList: LiveData<List<Post?>>? = null
 
     private var myPostsList: LiveData<List<Post>>? = null
 
     private val allPosts
     : LiveData<List<Post>>? = null
+
+    private val userPosts : LiveData<List<Post>>? = null
 
 
     val MyPost: LiveData<List<Post>>?
@@ -93,13 +94,56 @@ class Model private constructor() {
                 EventPostsListLoadingState.postValue(PostsListLoadingState.NOT_LOADING)
             }
         }
+    }
 
+    fun refreshUsersPosts(userId: String) {
+        EventPostsListLoadingState.setValue(PostsListLoadingState.LOADING)
 
+        val localLastUpdate: Long? = Post.localLastUpdate
 
-}
+        firebaseModel.getCurrentUserPosts(userId) { list ->
+            executor.execute {
+                var time = localLastUpdate
+
+                for (post in list!!) {
+                    if (post!!.deleted == true) {
+                        localDb.PostDao().delete(post)
+                    } else {
+                        firebaseModel.getUserById(post.userId!!) { user ->
+                            if (user != null) {
+                                post.ownerImageUrl = user.imageUrl
+                                post.ownerName = user.userName
+
+                            }
+                            executor.execute {
+                                localDb.PostDao().insertAll(post)
+                            }
+                        }
+                    }
+
+                    if (time!! < post.lastUpdated) {
+                        time = post.lastUpdated
+                    }
+                }
+
+                try {
+                    Thread.sleep(3000)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+
+                Post.localLastUpdate = time
+                EventPostsListLoadingState.postValue(PostsListLoadingState.NOT_LOADING)
+            }
+        }
+    }
 
     fun getAllPosts(): LiveData<List<Post>> {
         return allPosts?:localDb.PostDao().getAll()
+    }
+
+    fun getCurrentUserPosts(userId: String): LiveData<List<Post>> {
+        return allPosts?:localDb.PostDao().getPostsByUser(userId)
     }
 
     fun register(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {
