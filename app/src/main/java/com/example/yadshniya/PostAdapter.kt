@@ -9,7 +9,7 @@ import com.example.yadshniya.Model.Post
 import com.example.yadshniya.R
 import com.squareup.picasso.Picasso
 
-class PostAdapter(private var posts: MutableList<Post>, private val isProfileScreen: Boolean) :
+class PostAdapter(var posts: MutableList<Post>, private val isProfileScreen: Boolean) :
     RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -45,10 +45,11 @@ class PostAdapter(private var posts: MutableList<Post>, private val isProfileScr
     override fun getItemCount(): Int = posts.size
 
     fun updatePosts(newPosts: List<Post>) {
-        posts.clear()
-        posts.addAll(newPosts)
+        posts = newPosts.toMutableList()
         notifyDataSetChanged()
     }
+
+
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ownerName: TextView = itemView.findViewById(R.id.owner_name)
