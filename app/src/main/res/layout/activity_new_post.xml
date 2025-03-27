@@ -5,8 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".NewPostActivity">
+    android:layout_height="match_parent">
 
     <ImageButton
         android:id="@+id/PicButtonNewPostScreen"
@@ -95,6 +94,17 @@
         app:layout_constraintStart_toEndOf="@+id/pickPrice"
         app:layout_constraintTop_toBottomOf="@+id/ed2" />
 
+    <ProgressBar
+        android:id="@+id/priceProgressBar"
+        android:layout_width="30dp"
+        android:layout_height="20dp"
+        android:elevation="10dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/ed3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/txt3"
+        app:layout_constraintTop_toBottomOf="@+id/ed2" />
+
     <EditText
         android:id="@+id/ed3"
         android:layout_width="320dp"
@@ -110,7 +120,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pickPrice" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/postButton"
         android:layout_width="320dp"
         android:layout_height="60dp"
@@ -122,7 +132,21 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ed3" />
+        app:layout_constraintTop_toBottomOf="@+id/ed3"/>
+
+
+    <ProgressBar
+        android:id="@+id/buttonProgressBar"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/postButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

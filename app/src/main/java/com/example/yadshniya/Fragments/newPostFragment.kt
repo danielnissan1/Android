@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -111,6 +112,11 @@ class NewPostFragment : Fragment() {
 
     private fun fetchPriceRecommendation(itemDescription: String, textView: TextView) {
         val apiKey = BuildConfig.GEMINI_API_KEY
+        val progressBar = root.findViewById<ProgressBar>(R.id.priceProgressBar)
+
+        // Show the loader before making the API request
+        progressBar.visibility = View.VISIBLE
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val requestBodyJson = JSONObject().apply {
@@ -118,14 +124,18 @@ class NewPostFragment : Fragment() {
                         put(JSONObject().apply {
                             put("parts", JSONArray().apply {
                                 put(JSONObject().apply {
-                                    put("text", "Item: $itemDescription. Provide a price range in shekels, for example: 100₪-200₪, with no description. if you don't have an answer like this return \"refine description\"")
+                                    put(
+                                        "text",
+                                        "Item: $itemDescription. Provide a price range in shekels, for example: 100₪-200₪, with no description. if you don't have an answer like this return \"refine description\""
+                                    )
                                 })
                             })
                         })
                     })
                 }
 
-                val body = requestBodyJson.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
+                val body = requestBodyJson.toString()
+                    .toRequestBody("application/json; charset=utf-8".toMediaType())
 
                 val request = Request.Builder()
                     .url("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp:generateContent?key=${apiKey}")
@@ -136,45 +146,43 @@ class NewPostFragment : Fragment() {
                 val response = client.newCall(request).execute()
                 val responseBody = response.body?.string()
 
-                if (response.isSuccessful && responseBody != null) {
-                    val jsonResponse = JSONObject(responseBody)
-                    Log.d("API Response", jsonResponse.toString())
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful && responseBody != null) {
+                        val jsonResponse = JSONObject(responseBody)
+                        Log.d("API Response", jsonResponse.toString())
 
-                    val candidates = jsonResponse.getJSONArray("candidates")
-                    if (candidates.length() > 0) {
-                        val content = candidates.getJSONObject(0).getJSONObject("content")
-                        val parts = content.getJSONArray("parts")
-                        if (parts.length() > 0) {
-                            val recommendedPrice = parts.getJSONObject(0).getString("text")
-
-                            withContext(Dispatchers.Main) {
+                        val candidates = jsonResponse.getJSONArray("candidates")
+                        if (candidates.length() > 0) {
+                            val content = candidates.getJSONObject(0).getJSONObject("content")
+                            val parts = content.getJSONArray("parts")
+                            if (parts.length() > 0) {
+                                val recommendedPrice = parts.getJSONObject(0).getString("text")
                                 textView.text = recommendedPrice
-                            }
-                        } else {
-                            withContext(Dispatchers.Main) {
+                            } else {
                                 textView.text = "No text found in response"
                             }
-                        }
-                    } else {
-                        withContext(Dispatchers.Main) {
+                        } else {
                             textView.text = "No candidates found"
                         }
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
+                    } else {
                         Log.d("API Error", "Failed to fetch price. Response code: ${response.code}")
                         textView.text = "Failed to fetch price. Response code: ${response.code}"
                     }
+
+                    // Hide the loader once response is received
+                    progressBar.visibility = View.GONE
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     textView.text = "Error fetching price: ${e.message}"
+                    progressBar.visibility = View.GONE // Hide loader if error occurs
                 }
                 Log.e("API Exception", "Error: ${e.message}", e)
             }
         }
     }
+
 
     private fun openGallery() {
         val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
@@ -187,26 +195,38 @@ class NewPostFragment : Fragment() {
     }
 
     private fun defineImageSelectionCallBack() {
-        imageSelectionCallBack = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            try {
-                val imageUri: Uri? = result.data?.data
-                if (imageUri != null) {
-                    val imageSize = getImageSize(imageUri)
-                    val maxCanvasSize = 5 * 1024 * 1024 // 5MB
-                    if (imageSize > maxCanvasSize) {
-                        Toast.makeText(requireContext(), "Selected image is too large", Toast.LENGTH_SHORT).show()
+        imageSelectionCallBack =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                try {
+                    val imageUri: Uri? = result.data?.data
+                    if (imageUri != null) {
+                        val imageSize = getImageSize(imageUri)
+                        val maxCanvasSize = 5 * 1024 * 1024 // 5MB
+                        if (imageSize > maxCanvasSize) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Selected image is too large",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            pickImageButton.setImageURI(imageUri)
+                            imageURI = imageUri
+                            pickImageButton.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    android.R.color.white
+                                )
+                            )
+                        }
                     } else {
-                        pickImageButton.setImageURI(imageUri)
-                        imageURI = imageUri
-                        pickImageButton.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                        Toast.makeText(requireContext(), "No Image Selected", Toast.LENGTH_SHORT)
+                            .show()
                     }
-                } else {
-                    Toast.makeText(requireContext(), "No Image Selected", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Error processing result", Toast.LENGTH_SHORT)
+                        .show()
                 }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error processing result", Toast.LENGTH_SHORT).show()
             }
-        }
     }
 
     private fun post() {
@@ -222,23 +242,40 @@ class NewPostFragment : Fragment() {
         } else {
 
             if (imageURI == null) {
-                Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT)
+                    .show()
                 Log.d("NewPostFragment", "No image selected")
                 return
             }
 
-            val imageBitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageURI)
+            // Show the spinner and disable the button
+            val postButton = root.findViewById<Button>(R.id.postButton)
+            val progressBar = root.findViewById<ProgressBar>(R.id.buttonProgressBar)
+            postButton.isEnabled = false
+            progressBar.visibility = View.VISIBLE
+            postButton.text = ""  // Remove the button text when showing the spinner
 
+            val imageBitmap =
+                MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageURI)
 
-            // Add user
+            // Add user and create post
             val drawable = img.drawable
             if (drawable is BitmapDrawable) {
-//                val imageBitmap = drawable.bitmap
-                instance().createPost(Post(id = "0", description = description, location = location, price = price), imageBitmap) {
+                instance().createPost(
+                    Post(
+                        id = "0",
+                        description = description,
+                        location = location,
+                        price = price
+                    ), imageBitmap
+                ) {
+                    // Hide the spinner and enable the button again after post creation is complete
+                    progressBar.visibility = View.GONE
+                    postButton.isEnabled = true
+                    postButton.text = getString(R.string.post)  // Restore button text
                     findNavController().navigate(R.id.feedFragment)
                 }
             }
-
         }
     }
 }

@@ -196,16 +196,42 @@ class Model private constructor() {
     }
 
 
-    fun createPost(post: Post, img:Bitmap?, callback: EmptyCallback) {
-        img?.let {
-            cloudinaryModel.uploadBitmap(it) { url ->
+    fun createPost(post: Post, img: Bitmap?, callback: EmptyCallback) {
+        EventPostsListLoadingState.postValue(PostsListLoadingState.LOADING)
+
+        val onComplete: () -> Unit = {
+            mainThread.post {
+                EventPostsListLoadingState.postValue(PostsListLoadingState.NOT_LOADING)
+                callback()
+            }
+        }
+
+        if (img != null) {
+            cloudinaryModel.uploadBitmap(img) { url ->
                 if (!url.isNullOrEmpty()) {
                     post.imageUrl = url
-                    firebaseModel.createPost(post, callback)
+                }
+
+                firebaseModel.createPost(post) {
+                    executor.execute {
+                        localDb.PostDao().insertAll(post)
+                        onComplete()
+                    }
                 }
             }
-        } ?: callback()
+        } else {
+            firebaseModel.createPost(post) {
+                executor.execute {
+                    localDb.PostDao().insertAll(post)
+                    onComplete()
+                }
+            }
+        }
     }
+
+
+
+
 
 //    fun getAllPosts(callback: PostsCallback) {
 //        firebaseModel.getAllPosts(callback)
