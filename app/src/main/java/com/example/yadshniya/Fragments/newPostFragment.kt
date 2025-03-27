@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -111,6 +112,11 @@ class NewPostFragment : Fragment() {
 
     private fun fetchPriceRecommendation(itemDescription: String, textView: TextView) {
         val apiKey = BuildConfig.GEMINI_API_KEY
+        val progressBar = root.findViewById<ProgressBar>(R.id.priceProgressBar)
+
+        // Show the loader before making the API request
+        progressBar.visibility = View.VISIBLE
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val requestBodyJson = JSONObject().apply {
@@ -136,45 +142,43 @@ class NewPostFragment : Fragment() {
                 val response = client.newCall(request).execute()
                 val responseBody = response.body?.string()
 
-                if (response.isSuccessful && responseBody != null) {
-                    val jsonResponse = JSONObject(responseBody)
-                    Log.d("API Response", jsonResponse.toString())
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful && responseBody != null) {
+                        val jsonResponse = JSONObject(responseBody)
+                        Log.d("API Response", jsonResponse.toString())
 
-                    val candidates = jsonResponse.getJSONArray("candidates")
-                    if (candidates.length() > 0) {
-                        val content = candidates.getJSONObject(0).getJSONObject("content")
-                        val parts = content.getJSONArray("parts")
-                        if (parts.length() > 0) {
-                            val recommendedPrice = parts.getJSONObject(0).getString("text")
-
-                            withContext(Dispatchers.Main) {
+                        val candidates = jsonResponse.getJSONArray("candidates")
+                        if (candidates.length() > 0) {
+                            val content = candidates.getJSONObject(0).getJSONObject("content")
+                            val parts = content.getJSONArray("parts")
+                            if (parts.length() > 0) {
+                                val recommendedPrice = parts.getJSONObject(0).getString("text")
                                 textView.text = recommendedPrice
-                            }
-                        } else {
-                            withContext(Dispatchers.Main) {
+                            } else {
                                 textView.text = "No text found in response"
                             }
-                        }
-                    } else {
-                        withContext(Dispatchers.Main) {
+                        } else {
                             textView.text = "No candidates found"
                         }
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
+                    } else {
                         Log.d("API Error", "Failed to fetch price. Response code: ${response.code}")
                         textView.text = "Failed to fetch price. Response code: ${response.code}"
                     }
+
+                    // Hide the loader once response is received
+                    progressBar.visibility = View.GONE
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     textView.text = "Error fetching price: ${e.message}"
+                    progressBar.visibility = View.GONE // Hide loader if error occurs
                 }
                 Log.e("API Exception", "Error: ${e.message}", e)
             }
         }
     }
+
 
     private fun openGallery() {
         val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
