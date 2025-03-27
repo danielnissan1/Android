@@ -94,17 +94,56 @@ class Model private constructor() {
                 EventPostsListLoadingState.postValue(PostsListLoadingState.NOT_LOADING)
             }
         }
+    }
 
+    fun refreshUsersPosts(userId: String) {
+        EventPostsListLoadingState.setValue(PostsListLoadingState.LOADING)
 
+        val localLastUpdate: Long? = Post.localLastUpdate
 
-}
+        firebaseModel.getCurrentUserPosts(userId) { list ->
+            executor.execute {
+                var time = localLastUpdate
+
+                for (post in list!!) {
+                    if (post!!.deleted == true) {
+                        localDb.PostDao().delete(post)
+                    } else {
+                        firebaseModel.getUserById(post.userId!!) { user ->
+                            if (user != null) {
+                                post.ownerImageUrl = user.imageUrl
+                                post.ownerName = user.userName
+
+                            }
+                            executor.execute {
+                                localDb.PostDao().insertAll(post)
+                            }
+                        }
+                    }
+
+                    if (time!! < post.lastUpdated) {
+                        time = post.lastUpdated
+                    }
+                }
+
+                try {
+                    Thread.sleep(3000)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+
+                Post.localLastUpdate = time
+                EventPostsListLoadingState.postValue(PostsListLoadingState.NOT_LOADING)
+            }
+        }
+    }
 
     fun getAllPosts(): LiveData<List<Post>> {
         return allPosts?:localDb.PostDao().getAll()
     }
 
-    fun getUsersPosts(): LiveData<List<Post>> {
-        return allPosts?:localDb.PostDao().getPostsByUser()
+    fun getCurrentUserPosts(userId: String): LiveData<List<Post>> {
+        return allPosts?:localDb.PostDao().getPostsByUser(userId)
     }
 
     fun register(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {

@@ -46,6 +46,8 @@ class ProfileFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
     private var postList: MutableList<Post> = mutableListOf()
+    private val currentId: String?
+        get() = auth.currentUser?.uid
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,22 +69,25 @@ class ProfileFragment : Fragment() {
         postAdapter = PostAdapter(postList, false)
         recyclerView.adapter = postAdapter
 
-        instance().getAllPosts().observe(viewLifecycleOwner, Observer { posts ->
-            Log.d("profileFragment", "Fetched ${posts.size} posts")
+        currentId?.let { userId ->
+            instance().getCurrentUserPosts(userId).observe(viewLifecycleOwner, Observer { posts ->
+                Log.d("profileFragment", "Fetched ${posts.size} posts")
 
-            if (posts.isEmpty()) {
-                Log.e("profileFragment", "No posts fetched. Check Firestore query or database.")
-            }
+                if (posts.isEmpty()) {
+                    Log.e("profileFragment", "No posts fetched. Check Firestore query or database.")
+                }
 
-            postList.clear()
-            postList.addAll(posts)
-            postAdapter.notifyDataSetChanged()
-        })
+                postList.clear()
+                postList.addAll(posts)
+                postAdapter.notifyDataSetChanged()
+            })
+        } ?: Log.e("profileFragment", "User ID is null, cannot fetch user posts")
 
         instance().EventPostsListLoadingState.observe(viewLifecycleOwner, Observer { state ->
             Log.d("profileFragment", "Loading State: $state")
         })
 
+        reloadData()
         observeData()
     }
 
@@ -251,21 +256,25 @@ class ProfileFragment : Fragment() {
 
     private fun reloadData() {
         Log.d("profileFragment", "Reloading data...")
-        instance().refreshAllPosts()
+        currentId?.let { userId ->
+            instance().refreshUsersPosts(userId)
+        } ?: Log.e("profileFragment", "User ID is null, cannot reload data")
     }
 
     private fun observeData() {
-        instance().getAllPosts().observe(viewLifecycleOwner, Observer { posts ->
-            Log.d("profileFragment", "Fetched ${posts.size} posts")
+        currentId?.let { userId ->
+            instance().getCurrentUserPosts(userId).observe(viewLifecycleOwner, Observer { posts ->
+                Log.d("profileFragment", "Fetched ${posts.size} posts")
 
-            if (posts.isNotEmpty()) {
-                postList.clear()
-                postList.addAll(posts)
-                postAdapter.notifyDataSetChanged()
-                Log.d("profileFragment", "Adapter notified with new data")
-            } else {
-                Log.e("profileFragment", "No posts to display")
-            }
-        })
+                if (posts.isNotEmpty()) {
+                    postList.clear()
+                    postList.addAll(posts)
+                    postAdapter.notifyDataSetChanged()
+                    Log.d("profileFragment", "Adapter notified with new data")
+                } else {
+                    Log.e("profileFragment", "No posts to display")
+                }
+            })
+        } ?: Log.e("profileFragment", "User ID is null, cannot")
     }
 }
