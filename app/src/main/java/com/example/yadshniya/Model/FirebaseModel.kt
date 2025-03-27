@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
@@ -88,6 +89,17 @@ class FirebaseModel internal constructor() {
                 callback()
             }
     }
+
+    fun updateUser(user: User, callback: EmptyCallback) {
+        val userRef = db.collection(User.COLLECTION_NAME).document(user.email!!) // Use email as the document ID
+
+        val userJson = user.toJson()
+        userRef.set(userJson, SetOptions.merge()) // Merge to avoid overwriting other fields
+            .addOnCompleteListener {
+                callback()
+            }
+    }
+
 
 
     fun createPost(post: Post, callback: EmptyCallback) {

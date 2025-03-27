@@ -136,6 +136,22 @@ class Model private constructor() {
         } ?: callback()
     }
 
+    fun updateUser(user: User, img: Bitmap?, callback: EmptyCallback) {
+        firebaseModel.updateUser(user) { // Update username first
+            img?.let {
+                cloudinaryModel.uploadBitmap(it) { url ->
+                    if (!url.isNullOrEmpty()) {
+                        user.imageUrl = url
+                        firebaseModel.updateUser(user, callback) // Update Firestore again with the new image URL
+                    } else {
+                        callback()
+                    }
+                }
+            } ?: callback()
+        }
+    }
+
+
     fun createPost(post: Post, img:Bitmap?, callback: EmptyCallback) {
         img?.let {
             cloudinaryModel.uploadBitmap(it) { url ->
