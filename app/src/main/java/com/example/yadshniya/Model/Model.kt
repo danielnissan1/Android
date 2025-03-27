@@ -3,7 +3,6 @@ package com.example.yadshniya.Model
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.core.os.HandlerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -34,12 +33,14 @@ class Model private constructor() {
         fun onComplete(data: T)
     }
 
-    private var allPostsList: LiveData<List<Post?>>? = null
+    private var userPostsList: LiveData<List<Post?>>? = null
 
     private var myPostsList: LiveData<List<Post>>? = null
 
     private val allPosts
     : LiveData<List<Post>>? = null
+
+    private val userPosts : LiveData<List<Post>>? = null
 
 
     val MyPost: LiveData<List<Post>>?
@@ -100,6 +101,10 @@ class Model private constructor() {
 
     fun getAllPosts(): LiveData<List<Post>> {
         return allPosts?:localDb.PostDao().getAll()
+    }
+
+    fun getUsersPosts(): LiveData<List<Post>> {
+        return allPosts?:localDb.PostDao().getPostsByUser()
     }
 
     fun register(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {

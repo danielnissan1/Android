@@ -66,7 +66,6 @@ class ProfileFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         postAdapter = PostAdapter(postList, false)
         recyclerView.adapter = postAdapter
-//        recyclerView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
 
         instance().getAllPosts().observe(viewLifecycleOwner, Observer { posts ->
             Log.d("profileFragment", "Fetched ${posts.size} posts")
@@ -85,7 +84,6 @@ class ProfileFragment : Fragment() {
         })
 
         observeData()
-        reloadData()
     }
 
         private fun setUserDetails() {
@@ -194,8 +192,10 @@ class ProfileFragment : Fragment() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             val email = currentUser.email!!
+            val userId = currentUser.uid
+
             val drawable = pickProfileImageButton.drawable
-            val user = User(email = email, userName = username) // Create a new user object
+            val user = User(id = userId, email = email, userName = username) // Create a new user object
 
             if (drawable is BitmapDrawable) {
                 val imageBitmap = drawable.bitmap
@@ -268,5 +268,4 @@ class ProfileFragment : Fragment() {
             }
         })
     }
-
 }
