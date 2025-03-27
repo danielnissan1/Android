@@ -66,7 +66,7 @@ class ProfileFragment : Fragment() {
         // Initialize RecyclerView
         recyclerView = requireView().findViewById(R.id.recycler_view_user_posts)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        postAdapter = PostAdapter(postList, false)
+        postAdapter = PostAdapter(postList, true)
         recyclerView.adapter = postAdapter
 
         currentId?.let { userId ->
