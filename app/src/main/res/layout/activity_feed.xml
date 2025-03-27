@@ -6,14 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone"
-        tools:ignore="MissingConstraints" />
-    <!-- ImageView at the top -->
     <ImageView
         android:id="@+id/image_view"
         android:layout_width="106dp"
@@ -32,4 +24,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         tools:listitem="@layout/post" />
 
+    <!-- ProgressBar on top of everything -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="10dp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+

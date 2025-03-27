@@ -7,11 +7,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.yadshniya.Model.Model
 import com.example.yadshniya.Model.Model.Companion.instance
 import com.example.yadshniya.R
 import com.example.yadshniya.PostsListViewModel
@@ -31,6 +33,7 @@ class FeedFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
+        // Make sure the correct layout is used!
         return inflater.inflate(R.layout.activity_feed, container, false)
     }
 
@@ -45,29 +48,43 @@ class FeedFragment : Fragment() {
         postAdapter = PostAdapter(mutableListOf(), false)
         recyclerView.adapter = postAdapter
 
-        observePosts() // Observe posts
-
+        observePosts()
         reloadData()
     }
 
     private fun observePosts() {
+        val hangerImage = view?.findViewById<ImageView>(R.id.image_view)
+
+        instance().EventPostsListLoadingState.observe(viewLifecycleOwner, Observer { state ->
+            if (state == Model.PostsListLoadingState.LOADING) {
+                progressBar.visibility = View.VISIBLE
+                hangerImage?.visibility = View.GONE
+            } else {
+                progressBar.visibility = View.GONE
+                hangerImage?.visibility = View.VISIBLE
+            }
+        })
+
         instance().getAllPosts().observe(viewLifecycleOwner, Observer { posts ->
             if (posts.isNotEmpty()) {
-                progressBar.visibility = View.GONE // Hide loader when posts are loaded
                 Log.d("FeedFragment", "Fetched ${posts.size} posts")
                 viewModel?.updatePostList(posts)
                 postAdapter.updatePosts(posts)
+            } else {
+                Log.d("FeedFragment", "No posts available")
             }
         })
     }
 
+
+
     override fun onResume() {
         super.onResume()
-        reloadData() // Reload data to ensure the new post is shown
+        reloadData()
     }
 
     private fun reloadData() {
-        progressBar.visibility = View.VISIBLE // Show loader before refreshing
+        progressBar.visibility = View.VISIBLE
         instance().refreshAllPosts()
     }
 }
