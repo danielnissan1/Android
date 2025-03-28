@@ -9,11 +9,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.example.yadshniya.Model.FirebaseModel
+import com.example.yadshniya.Model.Model
 import com.example.yadshniya.Model.Post
 import com.example.yadshniya.R
 import com.squareup.picasso.Picasso
 
-class PostAdapter(var posts: MutableList<Post>, private val isProfileScreen: Boolean) :
+class PostAdapter(
+    var posts: MutableList<Post>,
+    private val isProfileScreen: Boolean) :
     RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -46,7 +50,8 @@ class PostAdapter(var posts: MutableList<Post>, private val isProfileScreen: Boo
         }
 
         // Set up edit functionality
-        setUI(holder)
+        setUI(holder, position)
+
     }
 
     override fun getItemCount(): Int = posts.size
@@ -67,10 +72,11 @@ class PostAdapter(var posts: MutableList<Post>, private val isProfileScreen: Boo
         val btnDelete: ImageButton = itemView.findViewById(R.id.btn_delete_post)
     }
 
-    private fun setUI(holder: PostViewHolder) {
+    private fun setUI(holder: PostViewHolder,  position: Int) {
         var isEditing = false
 
         val editButton = holder.itemView.findViewById<ImageButton>(R.id.btn_edit_post)
+        val deleteButton = holder.itemView.findViewById<ImageButton>(R.id.btn_delete_post)
         val description = holder.itemView.findViewById<TextView>(R.id.item_description)
         val price = holder.itemView.findViewById<TextView>(R.id.item_price)
         val postImage = holder.itemView.findViewById<ImageView>(R.id.post_image)
@@ -80,7 +86,8 @@ class PostAdapter(var posts: MutableList<Post>, private val isProfileScreen: Boo
         val editPrice = EditText(context)
 
         editDescription.setText(description.text)
-        editDescription.textSize = description.textSize / context.resources.displayMetrics.scaledDensity
+        editDescription.textSize =
+            description.textSize / context.resources.displayMetrics.scaledDensity
         editDescription.setTextColor(description.currentTextColor)
         editDescription.setTypeface(description.typeface)
         editDescription.visibility = View.GONE
@@ -140,6 +147,21 @@ class PostAdapter(var posts: MutableList<Post>, private val isProfileScreen: Boo
             }
 
             isEditing = !isEditing
+        }
+
+        deleteButton.setOnClickListener {
+            Log.d("Delete", "delete button in post clicked!")
+            val postToDelete = posts[position]
+            Log.d("Delete", "post to delete: $postToDelete")
+
+            // Delete from local database in the background
+            Model.instance().deletePost(postToDelete)
+
+            //THIS WORK!
+            // Remove from RecyclerView and update UI
+            posts.removeAt(position)
+            notifyItemRemoved(position)
+            notifyItemRangeChanged(position, posts.size)
         }
     }
 }

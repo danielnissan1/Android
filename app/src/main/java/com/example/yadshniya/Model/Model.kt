@@ -3,6 +3,7 @@ package com.example.yadshniya.Model
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.core.os.HandlerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -141,6 +142,27 @@ class Model private constructor() {
     fun getAllPosts(): LiveData<List<Post>> {
         return allPosts?:localDb.PostDao().getAll()
     }
+
+    fun deletePost(post: Post) {
+        executor.execute {
+            val posts = localDb.PostDao().getAll().value
+            Log.d("Delete", "All posts in DB: ${posts?.size}")
+
+            localDb.PostDao().delete(post)
+            Log.d("Delete", "Deleted post from local DB: ${post.id}")
+        }
+        val remainingPosts = localDb.PostDao().getAll().value
+        Log.d("Delete", "Remaining posts in DB: ${remainingPosts?.size}")
+
+        firebaseModel.deletePost(post.id) { success ->
+            if (success) {
+                Log.d("Delete", "Post deleted from Firestore")
+            } else {
+                Log.d("Delete", "Failed to delete post from Firestore")
+            }
+        }
+    }
+
 
     fun getCurrentUserPosts(userId: String): LiveData<List<Post>> {
         return allPosts?:localDb.PostDao().getPostsByUser(userId)

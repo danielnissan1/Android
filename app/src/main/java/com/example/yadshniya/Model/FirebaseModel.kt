@@ -193,7 +193,6 @@ class FirebaseModel internal constructor() {
                                     }
                                 }
                         }
-                        Log.d("FirebaseModel", "posts in all posts: $posts")
                     } else {
                         callback(posts)
                     }
@@ -280,5 +279,23 @@ class FirebaseModel internal constructor() {
                 callback(null)
             }
     }
+
+        fun deletePost(postId: String, callback: (Boolean) -> Unit) {
+            // Reference the Firestore collection and find the document by ID
+            db.collection(Post.COLLECTION_NAME)
+                .document(postId)
+                .delete()
+                .addOnSuccessListener {
+                    // If deletion is successful, callback with true
+                    Log.d("TAG", "Post with ID $postId deleted successfully")
+                    callback(true)
+                }
+                .addOnFailureListener { exception ->
+                    // Handle error if deletion fails
+                    Log.d("TAG", "Error deleting post: ", exception)
+                    callback(false)
+                }
+        }
+
 
 }
