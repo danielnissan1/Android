@@ -31,7 +31,7 @@ class PostAdapter(
         holder.ownerName.text = post.ownerName
         holder.itemLocation.text = post.location
         holder.itemDescription.text = post.description
-        holder.itemPrice.text = "${post.price}₪"
+        holder.itemPrice.text = "${post.price}"
 
         Picasso.get().load(post.imageUrl).into(holder.postImage)
 
@@ -130,12 +130,24 @@ class PostAdapter(
             Log.d("DEBUG", "Edit button clicked! isEditing: $isEditing")
 
             if (isEditing) {
+                // Get the new values from the EditText fields
+                val newDescription = editDescription.text.toString()
+                val newPrice = editPrice.text.toString().trim().toDoubleOrNull() ?: 0.0
+                Log.d("Update", "Updating post with new price: $newPrice")
+
+                val post = posts[position]
+
+                // Update the local UI
                 description.text = editDescription.text.toString()
                 price.text = editPrice.text.toString()
                 description.visibility = View.VISIBLE
                 price.visibility = View.VISIBLE
                 editDescription.visibility = View.GONE
                 editPrice.visibility = View.GONE
+
+                // Call the updatePost function from the Model class to save the changes
+                Log.d("Update", "Updating post with new price: $newPrice")
+                Model.instance().updatePost(post.id, newDescription, newPrice)
             } else {
                 editDescription.setText(description.text.toString())
                 editPrice.setText(price.text.toString())
