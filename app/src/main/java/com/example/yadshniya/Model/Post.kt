@@ -25,36 +25,6 @@ class Post(
     var ownerImageUrl: String? = null) {
 
 
-//    constructor(
-//        id: String,
-//        description: String,
-//        location: String?,
-//        userId: String?,
-//
-//    ) {
-//        this.id = id
-//        this.description = description
-//        this.location = location
-//        this.userId = userId
-//        this.deleted = false
-//        this.lastUpdated = 0
-//
-//    }
-//
-//    constructor() {
-//        this.id = ""
-//        this.description = ""
-//        this.location = ""
-//        this.userId = ""
-//        this.deleted = false
-//    }
-
-    enum class Difficulty {
-        Easy,
-        Medium,
-        Hard
-    }
-
     fun toJson(): Map<String, Any?> {
         val json: MutableMap<String, Any?> = HashMap()
         json["id"] = id
@@ -120,8 +90,6 @@ class Post(
             val id = json["id"] as String
             val description = json["description"] as String
             val location = json["location"] as String
-
-            // Handle price as before
             val price = when (val priceValue = json["price"]) {
                 is Int -> priceValue
                 is Long -> priceValue.toInt()

@@ -30,28 +30,10 @@ class Model private constructor() {
     val EventPostsListLoadingState: MutableLiveData<PostsListLoadingState> =
         MutableLiveData(PostsListLoadingState.NOT_LOADING)
 
-    interface Listener<T> {
-        fun onComplete(data: T)
-    }
-
-    private var userPostsList: LiveData<List<Post?>>? = null
-
-    private var myPostsList: LiveData<List<Post>>? = null
 
     private val allPosts
     : LiveData<List<Post>>? = null
 
-    private val userPosts : LiveData<List<Post>>? = null
-
-
-    val MyPost: LiveData<List<Post>>?
-        get() {
-            if (myPostsList == null) {
-                myPostsList = localDb.PostDao()?.getPostsByUser(firebaseModel.userEmail)
-//                refreshAllMaslulim()
-            }
-            return myPostsList
-        }
 
     fun refreshAllPosts() {
         EventPostsListLoadingState.setValue(PostsListLoadingState.LOADING)
@@ -143,7 +125,8 @@ class Model private constructor() {
         return allPosts?:localDb.PostDao().getAll()
     }
 
-    fun deletePost(post: Post) {
+    fun deletePost(post: Post, callback: EmptyCallback) {
+        post.deleted = true
         executor.execute {
             localDb.PostDao().delete(post)
             Log.d("Delete", "Deleted post from local DB: ${post.id}")
@@ -152,11 +135,14 @@ class Model private constructor() {
         Log.d("Delete", "Remaining posts in DB: ${remainingPosts?.size}")
 
         firebaseModel.deletePost(post.id) { success ->
-            if (success) {
-                Log.d("Delete", "Post deleted from Firestore")
-            } else {
-                Log.d("Delete", "Failed to delete post from Firestore")
-            }
+            refreshAllPosts()
+
+                if (success) {
+                    Log.d("Delete", "Post deleted from Firestore")
+                } else {
+                    Log.d("Delete", "Failed to delete post from Firestore")
+                }
+
         }
     }
 
@@ -196,18 +182,6 @@ class Model private constructor() {
         firebaseModel.login(email, password, listener)
     }
 
-//    val isSignedIn: Boolean
-//        get() = firebaseModel.isSignedIn()
-
-//    fun signOut() {
-//        EventPostsListLoadingState.postValue(null)
-//        firebaseModel.signOut()
-//    }
-
-//    fun createUser(user: User, listener: (User?) -> Unit) {
-//        firebaseModel.createUser(user, listener)
-//    }
-
     fun createUser(user: User, img:Bitmap?, callback: EmptyCallback) {
         firebaseModel.createUser(user) {
             callback()
@@ -223,12 +197,12 @@ class Model private constructor() {
     }
 
     fun updateUser(user: User, img: Bitmap?, callback: EmptyCallback) {
-        firebaseModel.updateUser(user) { // Update username first
+        firebaseModel.updateUser(user) {
             img?.let {
                 cloudinaryModel.uploadBitmap(it) { url ->
                     if (!url.isNullOrEmpty()) {
                         user.imageUrl = url
-                        firebaseModel.updateUser(user, callback) // Update Firestore again with the new image URL
+                        firebaseModel.updateUser(user, callback)
                     } else {
                         callback()
                     }
@@ -270,25 +244,6 @@ class Model private constructor() {
             }
         }
     }
-
-
-
-
-
-
-
-//    fun getAllPosts(callback: PostsCallback) {
-//        firebaseModel.getAllPosts(callback)
-//    }
-
-
-
-//    fun getUserById(email: String?, listener: (FirebaseUser?) -> Unit) {
-//            firebaseModel.getUserById(email, listener)
-//    }
-
-//    val userEmail: String
-//        get() = firebaseModel.getUserEmail()
 
     fun uploadImage(name: String, bitmap: Bitmap, listener: (String?) -> Unit) {
 //            firebaseModel.uploadImage(name, bitmap, listener)
