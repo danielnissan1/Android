@@ -62,7 +62,7 @@ class Model private constructor() {
             executor.execute {
                 var time = localLastUpdate
 
-//                localDb.PostDao().deleteAll()
+                localDb.PostDao().deleteAll()
 
                 for (post in list!!) {
                     if (post!!.deleted == true) {
@@ -144,6 +144,7 @@ class Model private constructor() {
     }
 
     fun deletePost(post: Post) {
+        post.deleted = true
         executor.execute {
             val posts = localDb.PostDao().getAll().value
             Log.d("Delete", "All posts in DB: ${posts?.size}")
@@ -155,6 +156,7 @@ class Model private constructor() {
         Log.d("Delete", "Remaining posts in DB: ${remainingPosts?.size}")
 
         firebaseModel.deletePost(post.id) { success ->
+            refreshAllPosts()
             if (success) {
                 Log.d("Delete", "Post deleted from Firestore")
             } else {

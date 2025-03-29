@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -38,6 +39,8 @@ class ProfileFragment : Fragment() {
     private lateinit var root: View
     private var isEditing = false
     private var auth = Firebase.auth
+
+    private lateinit var postsLoader: ProgressBar
 
     private lateinit var pickProfileImageButton: ImageButton
     private var imageURI: Uri? = null
@@ -64,6 +67,7 @@ class ProfileFragment : Fragment() {
         setUI()
 
         // Initialize RecyclerView
+        postsLoader = view.findViewById(R.id.posts_loader)
         recyclerView = requireView().findViewById(R.id.recycler_view_user_posts)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         postAdapter = PostAdapter(postList, true)
@@ -263,6 +267,8 @@ class ProfileFragment : Fragment() {
 
     private fun observeData() {
         currentId?.let { userId ->
+            postsLoader.visibility = View.VISIBLE  // Show loader before fetching data
+
             instance().getCurrentUserPosts(userId).observe(viewLifecycleOwner, Observer { posts ->
                 Log.d("profileFragment", "Fetched ${posts.size} posts")
 
@@ -270,11 +276,13 @@ class ProfileFragment : Fragment() {
                     postList.clear()
                     postList.addAll(posts)
                     postAdapter.notifyDataSetChanged()
-                    Log.d("profileFragment", "Adapter notified with new data")
+                    Log.d("profileFragment", "Adapter updated with new data")
                 } else {
                     Log.e("profileFragment", "No posts to display")
                 }
+
+                postsLoader.visibility = View.GONE  // Hide loader after data is loaded
             })
-        } ?: Log.e("profileFragment", "User ID is null, cannot")
+        } ?: Log.e("profileFragment", "User ID is null, cannot observe data")
     }
 }

@@ -23,10 +23,12 @@ import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.yadshniya.BuildConfig
 import com.example.yadshniya.Model.Model.Companion.instance
 import com.example.yadshniya.Model.Post
+import com.example.yadshniya.PostsListViewModel
 import com.example.yadshniya.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +45,7 @@ class NewPostFragment : Fragment() {
 
     private lateinit var root: View
     private lateinit var pickImageButton: ImageButton
+    private var viewModel: PostsListViewModel? = null
 
     private val client = OkHttpClient()
     private lateinit var imageSelectionCallBack: ActivityResultLauncher<Intent>
@@ -268,11 +271,18 @@ class NewPostFragment : Fragment() {
                         location = location,
                         price = price
                     ), imageBitmap
-                ) {
-                    // Hide the spinner and enable the button again after post creation is complete
+                ) { viewModel?.addPost(
+                    Post(
+                        id = "0",
+                        description = description,
+                        location = location,
+                        price = price
+                    )
+                )
+
                     progressBar.visibility = View.GONE
                     postButton.isEnabled = true
-                    postButton.text = getString(R.string.post)  // Restore button text
+                    postButton.text = getString(R.string.post)
                     findNavController().navigate(R.id.feedFragment)
                 }
             }
