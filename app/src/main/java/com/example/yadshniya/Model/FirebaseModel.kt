@@ -94,7 +94,7 @@ class FirebaseModel internal constructor() {
         val userRef = db.collection(User.COLLECTION_NAME).document(user.email!!) // Use email as the document ID
 
         val userJson = user.toJson()
-        userRef.set(userJson, SetOptions.merge()) // Merge to avoid overwriting other fields
+        userRef.set(userJson, SetOptions.merge())
             .addOnCompleteListener {
                 callback()
             }
@@ -140,7 +140,6 @@ class FirebaseModel internal constructor() {
             .get()
             .addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
-                    // Assuming there's only one user with the given email
                     val user = querySnapshot.documents[0].toObject(User::class.java)
                     callback(user)
                 } else {
@@ -152,8 +151,6 @@ class FirebaseModel internal constructor() {
                 callback(null)
             }
     }
-
-
 
     fun getAllPosts(callback: PostsCallback) {
         db.collection(Post.COLLECTION_NAME).get(Source.SERVER)
@@ -281,17 +278,14 @@ class FirebaseModel internal constructor() {
     }
 
         fun deletePost(postId: String, callback: (Boolean) -> Unit) {
-            // Reference the Firestore collection and find the document by ID
             db.collection(Post.COLLECTION_NAME)
                 .document(postId)
                 .delete()
                 .addOnSuccessListener {
-                    // If deletion is successful, callback with true
                     Log.d("TAG", "Post with ID $postId deleted successfully")
                     callback(true)
                 }
                 .addOnFailureListener { exception ->
-                    // Handle error if deletion fails
                     Log.d("TAG", "Error deleting post: ", exception)
                     callback(false)
                 }

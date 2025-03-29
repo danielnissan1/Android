@@ -11,7 +11,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.yadshniya.MyApplication
 
 @Database(entities = [Post::class], version = 4)
-//@TypeConverters([Converters::class])
 abstract class AppLocalDbRepository : RoomDatabase() {
     abstract fun PostDao(): PostDao
 
@@ -33,13 +32,5 @@ abstract class AppLocalDbRepository : RoomDatabase() {
                 instance
             }
         }
-
-//            get() = Room.databaseBuilder(
-//                MyApplication.context,
-//                AppLocalDbRepository::class.java,
-//                "dbFileName.db"
-//            )
-//                .fallbackToDestructiveMigration()
-//                .build()
     }
 }

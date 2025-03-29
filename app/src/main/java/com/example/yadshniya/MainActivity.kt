@@ -15,24 +15,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate() called")
-//        enableEdgeToEdge()
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.bottom_navigation)) { v, insets ->
-//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-//            insets
-//        }
 
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser == null) {
-            // No user is logged in, move to login page
             navigateToLogin()
         } else {
-            // User is logged in, continue with the main UI
             setContentView(R.layout.main_screen)
             setUI()
         }
 
-//        setContentView(R.layout.main_screen)
         setUI()
 
     }

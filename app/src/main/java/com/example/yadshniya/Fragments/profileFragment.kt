@@ -28,6 +28,7 @@ import com.example.yadshniya.LoginActivity
 import com.example.yadshniya.Model.Model.Companion.instance
 import com.example.yadshniya.Model.Post
 import com.example.yadshniya.Model.User
+import com.example.yadshniya.PostsListViewModel
 import com.example.yadshniya.R
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -66,7 +67,6 @@ class ProfileFragment : Fragment() {
         setUserDetails()
         setUI()
 
-        // Initialize RecyclerView
         postsLoader = view.findViewById(R.id.posts_loader)
         recyclerView = requireView().findViewById(R.id.recycler_view_user_posts)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -152,7 +152,6 @@ class ProfileFragment : Fragment() {
 
         (username.parent as ViewGroup).addView(editUsername)
 
-        // Edit profile logic
         editButton.setOnClickListener {
             Log.d("ProfileFragment", "Edit button clicked! isEditing: $isEditing")
             if (isEditing) {
@@ -181,7 +180,6 @@ class ProfileFragment : Fragment() {
             isEditing = !isEditing // Toggle state
         }
 
-        // Exit Button Click Listener
         exitButton.setOnClickListener {
             Log.d("ProfileFragment", "Exit button clicked! Exiting edit mode.")
             auth.signOut()

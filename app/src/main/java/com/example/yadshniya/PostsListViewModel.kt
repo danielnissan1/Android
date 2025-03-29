@@ -8,22 +8,17 @@ class PostsListViewModel : ViewModel() {
     val postList: List<Post>?
         get() = _postList
 
-//    fun updatePostList(posts: List<Post>) {
-//        _postList = posts
-//    }
-
-
-//    fun updatePostList(newPost: Post) {
-//        val currentList = _postList ?: emptyList()
-//        _postList = listOf(newPost) + currentList
-//    }
-
     fun updatePostList(posts: List<Post>) {
         _postList = posts
     }
 
     fun addPost(newPost: Post) {
         val currentList = _postList ?: emptyList()
-        _postList = listOf(newPost) + currentList // Prepend new post
+        _postList = listOf(newPost) + currentList
+    }
+
+    fun removePost(post: Post) {
+        val currentList = _postList ?: emptyList()
+        _postList = currentList.filter { it != post }
     }
 }

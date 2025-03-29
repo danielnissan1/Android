@@ -71,14 +71,11 @@ class NewPostFragment : Fragment() {
             post()
         }
 
-        // Initially, set the Pick Price button visibility to GONE
         pickPriceButton.visibility = View.GONE
         priceRecommendationTextView.visibility = View.GONE
 
-        // Add TextWatcher to the description EditText
         descriptionEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                // Check if description is not empty
                 if (s != null && s.isNotEmpty()) {
                     pickPriceButton.visibility = View.VISIBLE // Show the button
                     priceRecommendationTextView.visibility = View.VISIBLE
@@ -99,13 +96,10 @@ class NewPostFragment : Fragment() {
             }
         }
 
-        // Image picker logic
         defineImageSelectionCallBack()
         pickImageButton.setOnClickListener {
             openGallery()
         }
-
-        // Handle system bars (optional)
         ViewCompat.setOnApplyWindowInsetsListener(root.findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -117,7 +111,6 @@ class NewPostFragment : Fragment() {
         val apiKey = BuildConfig.GEMINI_API_KEY
         val progressBar = root.findViewById<ProgressBar>(R.id.priceProgressBar)
 
-        // Show the loader before making the API request
         progressBar.visibility = View.VISIBLE
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -172,14 +165,13 @@ class NewPostFragment : Fragment() {
                         textView.text = "Failed to fetch price. Response code: ${response.code}"
                     }
 
-                    // Hide the loader once response is received
                     progressBar.visibility = View.GONE
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     textView.text = "Error fetching price: ${e.message}"
-                    progressBar.visibility = View.GONE // Hide loader if error occurs
+                    progressBar.visibility = View.GONE
                 }
                 Log.e("API Exception", "Error: ${e.message}", e)
             }
@@ -250,18 +242,15 @@ class NewPostFragment : Fragment() {
                 Log.d("NewPostFragment", "No image selected")
                 return
             }
-
-            // Show the spinner and disable the button
             val postButton = root.findViewById<Button>(R.id.postButton)
             val progressBar = root.findViewById<ProgressBar>(R.id.buttonProgressBar)
             postButton.isEnabled = false
             progressBar.visibility = View.VISIBLE
-            postButton.text = ""  // Remove the button text when showing the spinner
+            postButton.text = ""
 
             val imageBitmap =
                 MediaStore.Images.Media.getBitmap(requireContext().contentResolver, imageURI)
 
-            // Add user and create post
             val drawable = img.drawable
             if (drawable is BitmapDrawable) {
                 instance().createPost(
