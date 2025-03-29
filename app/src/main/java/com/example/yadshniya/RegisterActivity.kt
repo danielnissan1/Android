@@ -207,16 +207,9 @@ private lateinit var binding: ActivityRegisterBinding
     }
 
     private fun toMainScreen() {
-
-//        val intent = Intent(this@feedFragmentDirections, RegisterActivity::class.java)
-//        startActivity(intent)
-
-//        val intent: Intent = Intent(
-//            getContext(),
-//            MainActivity::class.java
-//        )
-//        startActivity(intent)
-//        getActivity().finish()
+        val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
 }
