@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.yadshniya.EmptyCallback
 import com.example.yadshniya.MyApplication
+import com.example.yadshniya.PostsCallback
 import com.google.firebase.auth.FirebaseUser
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -150,9 +151,29 @@ class Model private constructor() {
     }
 
 
-    fun getCurrentUserPosts(userId: String): LiveData<List<Post>> {
-        return allPosts?:localDb.PostDao().getPostsByUser(userId)
+    fun getCurrentUserPosts(user: FirebaseUser, callback: (List<Post>) -> Unit) {
+        firebaseModel.getUserByEmail(user.email!!) { user ->
+            if (user != null) {
+                val userId = user.id.toString()
+                refreshUsersPosts(userId)
+
+                executor.execute {
+                    val liveDataPosts = localDb.PostDao().getPostsByUser(userId)
+
+
+                    Handler(Looper.getMainLooper()).post {
+                        liveDataPosts.observeForever { posts ->
+                            callback(posts)
+                        }
+                    }
+                }
+            } else {
+                callback(emptyList())
+            }
+        }
     }
+
+
 
     fun register(email: String?, password: String?, listener: (FirebaseUser?) -> Unit) {
         firebaseModel.register(email, password, listener)

@@ -73,19 +73,18 @@ class ProfileFragment : Fragment() {
         postAdapter = PostAdapter(postList, true)
         recyclerView.adapter = postAdapter
 
-        currentId?.let { userId ->
-            instance().getCurrentUserPosts(userId).observe(viewLifecycleOwner, Observer { posts ->
-                Log.d("profileFragment", "Fetched ${posts.size} posts")
 
-                if (posts.isEmpty()) {
-                    Log.e("profileFragment", "No posts fetched. Check Firestore query or database.")
+                instance().getCurrentUserPosts(auth.currentUser!!) { posts ->
+                    Log.d("profileFragment", "Fetched ${posts.size} posts")
+
+                    if (posts.isEmpty()) {
+                        Log.e("profileFragment", "No posts fetched. Check Firestore query or database.")
+                    }
+
+                    postList.clear()
+                    postList.addAll(posts)
+                    postAdapter.notifyDataSetChanged()
                 }
-
-                postList.clear()
-                postList.addAll(posts)
-                postAdapter.notifyDataSetChanged()
-            })
-        } ?: Log.e("profileFragment", "User ID is null, cannot fetch user posts")
 
         instance().EventPostsListLoadingState.observe(viewLifecycleOwner, Observer { state ->
             Log.d("profileFragment", "Loading State: $state")
@@ -267,20 +266,21 @@ class ProfileFragment : Fragment() {
         currentId?.let { userId ->
             postsLoader.visibility = View.VISIBLE  // Show loader before fetching data
 
-            instance().getCurrentUserPosts(userId).observe(viewLifecycleOwner, Observer { posts ->
-                Log.d("profileFragment", "Fetched ${posts.size} posts")
+                instance().getCurrentUserPosts(auth.currentUser!!){ posts ->
+                    Log.d("profileFragment", "Fetched ${posts.size} posts")
 
-                if (posts.isNotEmpty()) {
-                    postList.clear()
-                    postList.addAll(posts)
-                    postAdapter.notifyDataSetChanged()
-                    Log.d("profileFragment", "Adapter updated with new data")
-                } else {
-                    Log.e("profileFragment", "No posts to display")
-                }
+                    if (posts.isNotEmpty()) {
+                        postList.clear()
+                        postList.addAll(posts)
+                        postAdapter.notifyDataSetChanged()
+                        Log.d("profileFragment", "Adapter updated with new data")
+                    } else {
+                        Log.e("profileFragment", "No posts to display")
+                    }
 
-                postsLoader.visibility = View.GONE  // Hide loader after data is loaded
-            })
+                    postsLoader.visibility = View.GONE  // Hide loader after data is loaded
+
+            }
         } ?: Log.e("profileFragment", "User ID is null, cannot observe data")
     }
 }
