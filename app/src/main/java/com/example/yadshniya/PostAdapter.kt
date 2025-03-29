@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.yadshniya.Model.FirebaseModel
 import com.example.yadshniya.Model.Model
 import com.example.yadshniya.Model.Post
+import com.example.yadshniya.PostsListViewModel
 import com.example.yadshniya.R
 import com.squareup.picasso.Picasso
 
@@ -19,6 +20,7 @@ class PostAdapter(
     var posts: MutableList<Post>,
     private val isProfileScreen: Boolean) :
     RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+    private var viewModel: PostsListViewModel? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.post, parent, false)
@@ -49,7 +51,6 @@ class PostAdapter(
             holder.btnDelete.visibility = View.GONE
         }
 
-        // Set up edit functionality
         setUI(holder, position)
 
     }
@@ -166,11 +167,10 @@ class PostAdapter(
             val postToDelete = posts[position]
             Log.d("Delete", "post to delete: $postToDelete")
 
-            // Delete from local database in the background
-            Model.instance().deletePost(postToDelete)
+            Model.instance().deletePost(postToDelete){
+                viewModel?.removePost(postToDelete)
+            }
 
-            //THIS WORK!
-            // Remove from RecyclerView and update UI
             posts.removeAt(position)
             notifyItemRemoved(position)
             notifyItemRangeChanged(position, posts.size)

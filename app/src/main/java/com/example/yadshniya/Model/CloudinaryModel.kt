@@ -43,7 +43,6 @@ class CloudinaryModel {
                 }
 
                 override fun onSuccess(requestId: String?, resultData: MutableMap<*, *>) {
-//                    val publicUrl = resultData?.get("secure_url") as? String ?: ""
                     val publicUrl = resultData["secure_url"] as? String ?: ""
                     onComplete(publicUrl)
                 }

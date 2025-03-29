@@ -24,8 +24,7 @@ import com.google.firebase.auth.auth
 
 class RegisterActivity : AppCompatActivity() {
     private val auth = Firebase.auth
-//    private var binding = ActivityRegisterBinding.inflate(layoutInflater)
-private lateinit var binding: ActivityRegisterBinding
+    private lateinit var binding: ActivityRegisterBinding
 
     private lateinit var pickProfileImageButton: ImageButton
     private lateinit var imageSelectionCallBack: ActivityResultLauncher<Intent>
@@ -62,43 +61,6 @@ private lateinit var binding: ActivityRegisterBinding
         }
     }
 
-    //Authentication
-//    private fun onSignUp() {
-//        val usernameInput = findViewById<TextView>(R.id.usernameTextfield)
-//        val username = usernameInput.text.toString().trim()
-//
-//        val passwordInput = findViewById<TextView>(R.id.passwordTextfield)
-//        val password = passwordInput.text.toString().trim()
-//
-//        auth.createUserWithEmailAndPassword(username, password).addOnSuccessListener {
-//            val authenticatedUser = it.user!!
-//
-////            val profileChange = UserProfileChangeRequest.Builder().setPhotoUri(imageURI)
-////                .setDisplayName("$firstNameValue $lastNameValue").build()
-//
-//
-////            authenticatedUser.updateProfile(profileChange)
-//
-////            UserModel.instance.addUser(
-////                User(authenticatedUser.uid, firstNameValue, lastNameValue), imageURI!!
-////            ) {
-////                Toast.makeText(
-////                    this@RegisterActivity, "Register Successful", Toast.LENGTH_SHORT
-////                ).show()
-////                val intent = Intent(this@RegisterActivity, MainActivity::class.java)
-////                startActivity(intent)
-////                finish()
-////            }
-//        }.addOnFailureListener {
-//            Toast.makeText(
-//                this@RegisterActivity, "Register Failed, " + it.message, Toast.LENGTH_SHORT
-//            ).show()
-//        }
-//
-//    }
-
-
-    //Functions that related to image profile upload
     @SuppressLint("InlinedApi")
     private fun openGallery() {
         val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
@@ -170,12 +132,6 @@ private lateinit var binding: ActivityRegisterBinding
                     if (drawable is BitmapDrawable) {
                         val imageBitmap = drawable.bitmap
                         Log.d("RegisterActivity", "Image bitmap: $imageBitmap")
-                        // Add to storage account and save url
-//                        instance()
-//                            .uploadImage(email, imageBitmap) { url ->
-//                                if (url != null) {
-//                                    newUser.imageUrl = url.toString()
-//                                }
                                 instance().createUser(
                                     newUser,
                                     img = imageBitmap

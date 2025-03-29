@@ -10,7 +10,7 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
-        Log.d("dewsa", "MyApplication initialized!") // Or use Log.d()
+        Log.d("dewsa", "MyApplication initialized!")
 
     }
 
@@ -18,8 +18,5 @@ class MyApplication : Application() {
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
 
-//        fun getContext(): Context {
-//            return context
-//        }
     }
 }

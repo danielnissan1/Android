@@ -72,5 +72,7 @@ dependencies {
     implementation(libs.cloudinary.android)
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation("com.squareup.picasso:picasso:2.8")
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
 
 }
