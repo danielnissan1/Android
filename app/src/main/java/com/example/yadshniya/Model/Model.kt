@@ -129,9 +129,6 @@ class Model private constructor() {
     fun deletePost(post: Post, callback: EmptyCallback) {
         post.deleted = true
         executor.execute {
-            val posts = localDb.PostDao().getAll().value
-            Log.d("Delete", "All posts in DB: ${posts?.size}")
-
             localDb.PostDao().delete(post)
             Log.d("Delete", "Deleted post from local DB: ${post.id}")
         }
@@ -149,6 +146,29 @@ class Model private constructor() {
 
         }
     }
+
+    fun updatePost(postId: String, newDescription: String, newPrice: Double) {
+        val lastUpdated = System.currentTimeMillis()
+
+        try {
+        // Update in local database (Room)
+        executor.execute {
+            localDb.PostDao().updatePost(postId, newPrice, newDescription, lastUpdated)
+            Log.d("Update", "Updated post in local DB: ${postId}")
+        }
+
+        // Update in Firestore
+        firebaseModel.updatePostInFirestore(postId, newDescription, newPrice) { success ->
+            if (success) {
+                Log.d("Update", "Post updated successfully in Firestore")
+            } else {
+                Log.d("Update", "Failed to update post in Firestore")
+            }
+        }
+        } catch (e: Exception) {
+        Log.e("Update", "Error updating post: ", e)}
+    }
+
 
 
     fun getCurrentUserPosts(user: FirebaseUser, callback: (List<Post>) -> Unit) {

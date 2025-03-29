@@ -87,7 +87,7 @@ class Post(
             return postItem
         }
         fun fromJSON(json: Map<String, Any>): Post {
-              val id = json["id"] as String
+            val id = json["id"] as String
             val description = json["description"] as String
             val location = json["location"] as String
             val price = when (val priceValue = json["price"]) {
@@ -97,10 +97,17 @@ class Post(
                 is String -> priceValue.toIntOrNull() ?: 0
                 else -> 0
             }
-            val userId = json["userId"] as? String?: ""
+
+            val userId = json["userId"] as? String ?: ""
             val imageUrl = json["imageUrl"] as String
             val deleted = json["isDeleted"] as Boolean
-            val lastUpdated = (json[LAST_UPDATED] as Timestamp).seconds
+
+            // Handling lastUpdated field
+            val lastUpdated = when (val lastUpdatedValue = json[LAST_UPDATED]) {
+                is Timestamp -> lastUpdatedValue.seconds  // If it's already a Timestamp
+                is Long -> lastUpdatedValue  // If it's a Long, directly use it
+                else -> 0L  // Default to 0 if it's missing or in another format
+            }
 
             return Post(
                 id = id,
@@ -113,6 +120,7 @@ class Post(
                 lastUpdated = lastUpdated
             )
         }
+
 
     }
 }

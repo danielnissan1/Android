@@ -18,6 +18,9 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class FirebaseModel internal constructor() {
     var db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -291,5 +294,34 @@ class FirebaseModel internal constructor() {
                 }
         }
 
+    private fun  formatDate(lastUpdated: Long): String {
+        val date = Date(lastUpdated)
+        val formatter = SimpleDateFormat("MMM dd, yyyy at h:mm:ss a", Locale.getDefault())
+        return formatter.format(date)
+    }
+    fun updatePostInFirestore(postId: String, newDescription: String, newPrice: Double, callback: (Boolean) -> Unit) {
+        // Reference the Firestore collection and find the document by ID
+        val postRef = db.collection(Post.COLLECTION_NAME).document(postId)
 
+        // Create a map with the updated fields
+        val updatedPostData = mapOf(
+            "description" to newDescription,
+            "price" to newPrice,
+//            "imageUrl" to newImageUrl,
+            "lastUpdated" to System.currentTimeMillis() // Assuming the last updated timestamp is needed as well
+        )
+
+        // Update the post with the new data
+        postRef.set(updatedPostData, SetOptions.merge())  // This will merge only the fields that you want to update
+            .addOnSuccessListener {
+                // If update is successful, callback with true
+                Log.d("TAG", "Post with ID $postId updated successfully in Firestore")
+                callback(true)
+            }
+            .addOnFailureListener { exception ->
+                // Handle error if update fails
+                Log.d("TAG", "Error updating post in Firestore: ", exception)
+                callback(false)
+            }
+    }
 }

@@ -24,4 +24,7 @@ interface PostDao {
 
     @Query("DELETE FROM Post")
     fun deleteAll()
+
+    @Query("UPDATE Post SET price = :price, description = :description, lastUpdated = :lastUpdated WHERE id = :postId")
+    fun updatePost(postId: String, price: Double, description: String, lastUpdated: Long)
 }
