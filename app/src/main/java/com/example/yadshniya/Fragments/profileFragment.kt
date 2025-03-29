@@ -257,9 +257,7 @@ class ProfileFragment : Fragment() {
 
     private fun reloadData() {
         Log.d("profileFragment", "Reloading data...")
-        currentId?.let { userId ->
-            instance().refreshUsersPosts(userId)
-        } ?: Log.e("profileFragment", "User ID is null, cannot reload data")
+            instance().refreshUsersPosts(auth.currentUser!!)
     }
 
     private fun observeData() {

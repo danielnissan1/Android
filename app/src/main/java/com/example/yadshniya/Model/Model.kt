@@ -80,46 +80,53 @@ class Model private constructor() {
         }
     }
 
-    fun refreshUsersPosts(userId: String) {
+    fun refreshUsersPosts(user: FirebaseUser) {
         EventPostsListLoadingState.setValue(PostsListLoadingState.LOADING)
 
         val localLastUpdate: Long? = Post.localLastUpdate
 
-        firebaseModel.getCurrentUserPosts(userId) { list ->
-            executor.execute {
-                var time = localLastUpdate
+        firebaseModel.getUserByEmail(user.email!!) { user ->
+            if (user != null) {
+                val userId = user.id.toString()
+                firebaseModel.getCurrentUserPosts(userId) { list ->
+                    executor.execute {
+                        var time = localLastUpdate
 
-                for (post in list!!) {
-                    if (post!!.deleted == true) {
-                        localDb.PostDao().delete(post)
-                    } else {
-                        firebaseModel.getUserById(post.userId!!) { user ->
-                            if (user != null) {
-                                post.ownerImageUrl = user.imageUrl
-                                post.ownerName = user.userName
+                        for (post in list!!) {
+                            if (post!!.deleted == true) {
+                                localDb.PostDao().delete(post)
+                            } else {
+                                firebaseModel.getUserById(post.userId!!) { user ->
+                                    if (user != null) {
+                                        post.ownerImageUrl = user.imageUrl
+                                        post.ownerName = user.userName
 
+                                    }
+                                    executor.execute {
+                                        localDb.PostDao().insertAll(post)
+                                    }
+                                }
                             }
-                            executor.execute {
-                                localDb.PostDao().insertAll(post)
+
+                            if (time!! < post.lastUpdated) {
+                                time = post.lastUpdated
                             }
                         }
-                    }
 
-                    if (time!! < post.lastUpdated) {
-                        time = post.lastUpdated
+                        try {
+                            Thread.sleep(3000)
+                        } catch (e: InterruptedException) {
+                            e.printStackTrace()
+                        }
+
+                        Post.localLastUpdate = time
+                        EventPostsListLoadingState.postValue(PostsListLoadingState.NOT_LOADING)
                     }
                 }
-
-                try {
-                    Thread.sleep(3000)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-
-                Post.localLastUpdate = time
-                EventPostsListLoadingState.postValue(PostsListLoadingState.NOT_LOADING)
             }
         }
+
+
     }
 
     fun getAllPosts(): LiveData<List<Post>> {
@@ -171,11 +178,11 @@ class Model private constructor() {
 
 
 
-    fun getCurrentUserPosts(user: FirebaseUser, callback: (List<Post>) -> Unit) {
-        firebaseModel.getUserByEmail(user.email!!) { user ->
+    fun getCurrentUserPosts(curruser: FirebaseUser, callback: (List<Post>) -> Unit) {
+        firebaseModel.getUserByEmail(curruser.email!!) { user ->
             if (user != null) {
                 val userId = user.id.toString()
-                refreshUsersPosts(userId)
+                refreshUsersPosts(curruser)
 
                 executor.execute {
                     val liveDataPosts = localDb.PostDao().getPostsByUser(userId)
